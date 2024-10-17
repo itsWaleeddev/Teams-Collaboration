@@ -3,22 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+    android:background="#1A2196F3"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ChooseMembers">
         <!-- Title TextView -->
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:padding="16dp"
-        android:text="Select Members for the WorkSpace"
-        android:textSize="20sp"
-        android:textStyle="bold"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:background="#3F60B5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="Select Members for the WorkSpace"
+        app:titleTextAppearance="@style/TextAppearance.Material3.BodyLarge"
+        app:titleTextColor="@color/white" />
 
         <!-- RecyclerView for member list -->
     <androidx.recyclerview.widget.RecyclerView
@@ -29,23 +29,23 @@
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
+        android:background="@color/white"
         android:padding="8dp"
         android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@+id/confirmButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title"
-        android:background="@color/white"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
         tools:listitem="@layout/item_member" />
 
         <!-- Confirm Button -->
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/confirmButton"
-        android:layout_width="wrap_content"
+        android:layout_width="175dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:background="@drawable/button_design"
-        android:padding="16dp"
+        android:padding="15dp"
         android:text="Confirm Selection"
         android:textAllCaps="false"
         android:textColor="@color/white"

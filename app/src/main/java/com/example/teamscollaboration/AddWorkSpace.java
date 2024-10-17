@@ -2,11 +2,13 @@ package com.example.teamscollaboration;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
@@ -23,8 +25,6 @@ import com.example.teamscollaboration.databinding.ActivityAddWorkSpaceBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import org.checkerframework.checker.units.qual.A;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -85,6 +85,16 @@ public class AddWorkSpace extends AppCompatActivity {
                 showDatePickerDialog();
             }
         });
+        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, R.layout.spinner_item, getResources().getTextArray(R.array.priority_levels)) {
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                view.setBackgroundColor(Color.WHITE); // Set the background color of the dropdown
+                return view;
+            }
+        };
+
+        binding.prioritySpinner.setAdapter(adapter);
         binding.submitWorkspaceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -92,21 +102,33 @@ public class AddWorkSpace extends AppCompatActivity {
                 workSpaceDescription = binding.workspaceDescriptionInput.getText().toString().trim();
                 deadLine = binding.deadlineDateInput.getText().toString().trim();
                 priority = binding.prioritySpinner.getSelectedItem().toString().trim();
-                if(workSpaceName.isEmpty()){
-                    binding.workspaceNameInput.setError("Please fill this field");
+
+                if (workSpaceName.isEmpty()) {
+                    binding.workspaceNameInput.setError("Field is Empty");
+                    return;
                 }
-                else if(workSpaceDescription.isEmpty()){
-                    binding.workspaceDescriptionInput.setError("Please fill this field");
+
+                if (workSpaceDescription.isEmpty()) {
+                    binding.workspaceDescriptionInput.setError("Field is Empty");
+                    return;
                 }
-                else if(deadLine.isEmpty()){
-                    binding.deadlineDateInput.setError("Please fill this field");
+
+                if (deadLine.isEmpty()) {
+                    Toast.makeText(AddWorkSpace.this, "Please Choose the Deadline", Toast.LENGTH_SHORT).show();
+                    return;
                 }
-                else{
-                    saveWorkSpace();
-                    Toast.makeText(AddWorkSpace.this, "WorkSpace Created Successfully", Toast.LENGTH_SHORT).show();
+
+                if (selectedMembers.isEmpty()) {
+                    Toast.makeText(AddWorkSpace.this, "Please Choose the members for WorkSpace", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+
+                // If all fields are filled, proceed to save the workspace
+                saveWorkSpace();
+                Toast.makeText(AddWorkSpace.this, "WorkSpace Created Successfully", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
     private void saveWorkSpace(){
         DatabaseReference workSpaceRef = databaseReference.child("Workspaces");
