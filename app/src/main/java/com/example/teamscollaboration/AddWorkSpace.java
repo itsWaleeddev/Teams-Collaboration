@@ -1,9 +1,12 @@
 package com.example.teamscollaboration;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
+import android.widget.DatePicker;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +21,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.checkerframework.checker.units.qual.A;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class AddWorkSpace extends AppCompatActivity {
     ActivityAddWorkSpaceBinding binding;
@@ -51,6 +57,13 @@ public class AddWorkSpace extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        binding.deadlineDateInput.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                binding.deadlineDateInput.setInputType(InputType.TYPE_NULL);
+                showDatePickerDialog();
+            }
+        });
         binding.submitWorkspaceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -79,5 +92,29 @@ public class AddWorkSpace extends AppCompatActivity {
         WorkSpaceModel workSpaceModel = new WorkSpaceModel(workSpaceName, workSpaceDescription,
                 deadLine, priority, System.currentTimeMillis(), auth.getCurrentUser().getUid());
         workSpaceRef.child(newWorkSpaceKey).setValue(workSpaceModel);
+    }
+    // DatePickerDialog method
+    private void showDatePickerDialog() {
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.set(year, month, day);
+
+                        // Format selected date
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+                        String formattedDate = dateFormat.format(calendar.getTime());
+
+                        // Set formatted date to EditText
+                        binding.deadlineDateInput.setText(formattedDate);
+                    }
+                },
+                // Set default date (current date)
+                Calendar.getInstance().get(Calendar.YEAR),
+                Calendar.getInstance().get(Calendar.MONTH),
+                Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+
+        datePickerDialog.show();
     }
 }

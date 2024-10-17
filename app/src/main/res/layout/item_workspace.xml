@@ -171,7 +171,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_marginTop="2dp"
-                android:layout_marginEnd="2dp"
                 android:layout_marginBottom="2dp"
                 android:gravity="center"
                 android:text="Deadline: "
