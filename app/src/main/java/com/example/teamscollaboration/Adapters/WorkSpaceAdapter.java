@@ -1,14 +1,17 @@
 package com.example.teamscollaboration.Adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.teamscollaboration.AllMembersActivity;
 import com.example.teamscollaboration.Models.WorkSpaceModel;
 import com.example.teamscollaboration.databinding.ItemWorkspaceBinding;
 
@@ -36,8 +39,17 @@ public class WorkSpaceAdapter extends RecyclerView.Adapter<WorkSpaceAdapter.View
     //what will happen after we create the viewholder object
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.binding.workspaceName.setText(workSpaceModelList.get(position).getWorkSpaceName());
-        holder.binding.workspaceDescription.setText(workSpaceModelList.get(position).getWorkSpaceDescription());
+        WorkSpaceModel workSpaceModel = workSpaceModelList.get(position);
+        holder.binding.workspaceName.setText(workSpaceModel.getWorkSpaceName());
+        holder.binding.workspaceDescription.setText(workSpaceModel.getWorkSpaceDescription());
+        holder.binding.showMembersButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, AllMembersActivity.class);
+                intent.putExtra("workSpaceKey", workSpaceModel.getWorkSpaceKey());
+                context.startActivity(intent);
+            }
+        });
     }
 
     //How many Items?

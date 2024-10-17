@@ -5,15 +5,18 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.teamscollaboration.Adapters.MembersModel;
 import com.example.teamscollaboration.Models.WorkSpaceModel;
 import com.example.teamscollaboration.databinding.ActivityAddWorkSpaceBinding;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,7 +26,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import org.checkerframework.checker.units.qual.A;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class AddWorkSpace extends AppCompatActivity {
     ActivityAddWorkSpaceBinding binding;
@@ -34,6 +39,19 @@ public class AddWorkSpace extends AppCompatActivity {
     String deadLine = null;
     String priority = null;
     String created_at = null;
+    List<MembersModel> selectedMembers = new ArrayList<>();
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 0 && resultCode == RESULT_OK) {
+            List<MembersModel> selectedMembers = (ArrayList<MembersModel>) data.getSerializableExtra("selectedMembers");
+            if (selectedMembers != null) {
+                this.selectedMembers = selectedMembers;
+            }
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +72,7 @@ public class AddWorkSpace extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(AddWorkSpace.this, ChooseMembers.class);
-                startActivity(intent);
+                startActivityForResult(intent, 0);
             }
         });
         binding.deadlineDateInput.setOnClickListener(new View.OnClickListener() {
@@ -89,8 +107,8 @@ public class AddWorkSpace extends AppCompatActivity {
     private void saveWorkSpace(){
         DatabaseReference workSpaceRef = databaseReference.child("Workspaces");
         String newWorkSpaceKey = workSpaceRef.push().getKey();
-        WorkSpaceModel workSpaceModel = new WorkSpaceModel(workSpaceName, workSpaceDescription,
-                deadLine, priority, System.currentTimeMillis(), auth.getCurrentUser().getUid());
+        WorkSpaceModel workSpaceModel = new WorkSpaceModel(newWorkSpaceKey,workSpaceName, workSpaceDescription,
+                deadLine, priority, System.currentTimeMillis(), auth.getCurrentUser().getUid(),selectedMembers, null);
         workSpaceRef.child(newWorkSpaceKey).setValue(workSpaceModel);
     }
     // DatePickerDialog method

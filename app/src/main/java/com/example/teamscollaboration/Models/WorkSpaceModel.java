@@ -1,5 +1,9 @@
 package com.example.teamscollaboration.Models;
 
+import com.example.teamscollaboration.Adapters.MembersModel;
+
+import java.util.List;
+
 public class WorkSpaceModel {
     String workSpaceName = null;
     String workSpaceDescription = null;
@@ -7,17 +11,48 @@ public class WorkSpaceModel {
     String priority = null;
     Long created_at = null;
     String adminId = null;
+    List<MembersModel> membersList;
+    String TeamLeader = null;
+    String workSpaceKey = null;
 
-    public WorkSpaceModel(String workSpaceName, String workSpaceDescription, String deadLine, String priority, Long created_at, String adminId) {
+    public WorkSpaceModel(String workSpaceKey, String workSpaceName, String workSpaceDescription, String deadLine, String priority,
+                          Long created_at, String adminId, List<MembersModel> membersList, String teamLeader) {
+        this.workSpaceKey = workSpaceKey;
         this.workSpaceName = workSpaceName;
         this.workSpaceDescription = workSpaceDescription;
         this.deadLine = deadLine;
         this.priority = priority;
         this.created_at = created_at;
         this.adminId = adminId;
+        this.membersList = membersList;
+        TeamLeader = teamLeader;
     }
 
     public WorkSpaceModel() {
+    }
+
+    public String getWorkSpaceKey() {
+        return workSpaceKey;
+    }
+
+    public void setWorkSpaceKey(String workSpaceKey) {
+        this.workSpaceKey = workSpaceKey;
+    }
+
+    public List<MembersModel> getMembersList() {
+        return membersList;
+    }
+
+    public void setMembersList(List<MembersModel> membersList) {
+        this.membersList = membersList;
+    }
+
+    public String getTeamLeader() {
+        return TeamLeader;
+    }
+
+    public void setTeamLeader(String teamLeader) {
+        TeamLeader = teamLeader;
     }
 
     public String getAdminId() {

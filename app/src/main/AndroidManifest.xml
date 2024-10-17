@@ -13,6 +13,9 @@
         android:theme="@style/Theme.TeamsCollaboration"
         tools:targetApi="34">
         <activity
+            android:name=".AllMembersActivity"
+            android:exported="false" />
+        <activity
             android:name=".ChooseMembers"
             android:exported="false" />
         <activity
