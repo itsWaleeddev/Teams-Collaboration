@@ -143,6 +143,7 @@ public class SignInActivity extends AppCompatActivity {
 
     public void updateUi() {
         Intent intent = new Intent(SignInActivity.this, MainActivity.class);
+        intent.putExtra("role",role);
         startActivity(intent);
         finish();
     }

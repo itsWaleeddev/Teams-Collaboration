@@ -2,11 +2,14 @@ package com.example.teamscollaboration;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
@@ -72,26 +75,37 @@ public class AddTaskActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-        binding.submittaskButton.setOnClickListener(new View.OnClickListener() {
+        binding.submitTaskButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 taskName = binding.taskNameInput.getText().toString().trim();
                 taskDescription = binding.taskDescriptionInput.getText().toString().trim();
                 taskDeadline = binding.deadlineDateInput.getText().toString().trim();
                 priority = binding.prioritySpinner.getSelectedItem().toString().trim();
-                if(taskName.isEmpty()){
-                    binding.taskNameInput.setError("Please fill this field");
+
+                if (taskName.isEmpty()) {
+                    binding.taskNameInput.setError("Field is Empty");
+                    return;
                 }
-                else if(taskDescription.isEmpty()){
-                    binding.taskDescriptionInput.setError("Please fill this field");
+
+                if (taskDescription.isEmpty()) {
+                    binding.taskDescriptionInput.setError("Field is Empty");
+                    return;
                 }
-                else if(taskDeadline.isEmpty()){
-                    binding.deadlineDateInput.setError("Please fill this field");
+
+                if (taskDeadline.isEmpty()) {
+                    Toast.makeText(AddTaskActivity.this, "Please Choose the Deadline", Toast.LENGTH_SHORT).show();
+                    return;
                 }
-                else{
-                    saveWorkSpace();
-                    Toast.makeText(AddTaskActivity.this, "Task Created Successfully", Toast.LENGTH_SHORT).show();
+
+                if (selectedMembers.isEmpty()) {
+                    Toast.makeText(AddTaskActivity.this, "Please Choose the members for Task", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+
+                // If all fields are filled, proceed to save the workspace
+                saveTask();
+                Toast.makeText(AddTaskActivity.this, "Task Created Successfully", Toast.LENGTH_SHORT).show();
             }
         });
         binding.chooseMembersButton.setOnClickListener(new View.OnClickListener() {
@@ -102,13 +116,25 @@ public class AddTaskActivity extends AppCompatActivity {
                 startActivityForResult(intent, 0);
             }
         });
+        binding.deadlineDateInput.setInputType(InputType.TYPE_NULL);
+        binding.deadlineDateInput.setFocusable(false);
+        binding.deadlineDateInput.setFocusableInTouchMode(false);
         binding.deadlineDateInput.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                binding.deadlineDateInput.setInputType(InputType.TYPE_NULL);
                 showDatePickerDialog();
             }
         });
+        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, R.layout.spinner_item, getResources().getTextArray(R.array.priority_levels)) {
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                view.setBackgroundColor(Color.WHITE); // Set the background color of the dropdown
+                return view;
+            }
+        };
+
+        binding.prioritySpinner.setAdapter(adapter);
     }
 
     @Override
@@ -142,7 +168,7 @@ public class AddTaskActivity extends AppCompatActivity {
 
         datePickerDialog.show();
     }
-    private void saveWorkSpace(){
+    private void saveTask(){
         DatabaseReference tasksRef = databaseReference.child("Tasks").child(workSpaceKey);
         String newTaskKey = tasksRef.push().getKey();
         TasksModel tasksModel = new TasksModel(newTaskKey, taskName,taskDescription, taskDeadline,

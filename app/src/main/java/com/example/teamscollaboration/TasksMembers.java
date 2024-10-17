@@ -1,10 +1,13 @@
 package com.example.teamscollaboration;
 
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -38,6 +41,9 @@ public class TasksMembers extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        setSupportActionBar(binding.toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
         workSpaceModel = (WorkSpaceModel) getIntent().getSerializableExtra("workSpace");
         if(workSpaceModel!=null){
             membersModelList = workSpaceModel.getMembersList();
@@ -53,6 +59,13 @@ public class TasksMembers extends AppCompatActivity {
                 finish();
             }
         });
+    }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId()==android.R.id.home){
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
     private void setAdapter(){
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));

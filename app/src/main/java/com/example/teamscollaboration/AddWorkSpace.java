@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -13,6 +14,7 @@ import android.widget.DatePicker;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -129,6 +131,13 @@ public class AddWorkSpace extends AppCompatActivity {
             }
         });
 
+    }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId()==android.R.id.home){
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
     private void saveWorkSpace(){
         DatabaseReference workSpaceRef = databaseReference.child("Workspaces");

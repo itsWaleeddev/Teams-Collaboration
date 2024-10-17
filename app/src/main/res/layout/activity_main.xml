@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="#1A2196F3"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="@drawable/signin_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -36,6 +37,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginTop="5dp"
                     android:text="Welcome Back"
+                    android:textColor="@color/white"
                     android:textSize="18sp" />
 
                 <TextView
@@ -44,7 +46,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:text="sample name"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="25dp"
                     android:textStyle="bold" />
 
@@ -54,6 +56,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="60dp"
                     android:text="Role"
+                    android:textColor="@color/white"
                     android:textSize="18sp" />
 
             </LinearLayout>
@@ -93,9 +96,9 @@
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
         android:minHeight="480dp"
         app:layout_constraintBottom_toTopOf="@+id/addWorkspace"
@@ -111,9 +114,13 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="10dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="10dp"
         android:contentDescription="add workspace"
         android:src="@drawable/baseline_add_24"
+        android:tint="@color/white"
+        android:tintMode="src_in"
+        app:backgroundTint="#3F60B5"
+        app:backgroundTintMode="screen"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

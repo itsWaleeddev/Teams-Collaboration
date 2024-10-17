@@ -3,9 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+    android:background="#1A2196F3"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AddTaskActivity">
+    <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -18,12 +20,26 @@
         app:titleTextAppearance="@style/TextAppearance.Material3.BodyLarge"
         app:titleTextColor="@color/white" />
 
+    <!-- Workspace Name Label -->
+    <TextView
+        android:id="@+id/taskNameLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Task Name"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <!-- Workspace Name Input -->
     <EditText
         android:id="@+id/taskNameInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="10dp"
         android:background="@drawable/searchview_shape"
         android:hint="Enter Task Name"
@@ -32,7 +48,20 @@
         android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@id/taskNameLabel" />
+
+    <!-- Workspace Description Label -->
+    <TextView
+        android:id="@+id/taskDescriptionLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="15dp"
+        android:text="Task Description"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/taskNameInput" />
 
     <!-- Workspace Description Input -->
     <EditText
@@ -40,33 +69,34 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="10dp"
         android:background="@drawable/searchview_shape"
+        android:gravity="start"
         android:hint="Write Task Description"
         android:inputType="textMultiLine"
-        android:minHeight="48dp"
+        android:minHeight="100dp"
         android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/taskNameInput" />
+        app:layout_constraintTop_toBottomOf="@id/taskDescriptionLabel" />
 
     <!-- Choose Members Button -->
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/chooseMembersButton"
-        android:layout_width="wrap_content"
+        android:layout_width="175dp"
         android:layout_height="48dp"
         android:layout_marginTop="15dp"
         android:background="@drawable/button_design"
         android:padding="15dp"
-        android:text="Choose Members"
+        android:text="Assigned to"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/taskDescriptionInput"
         tools:ignore="TouchTargetSize" />
 
-    <!-- Deadline Date Input -->
+    <!-- Deadline Label -->
     <TextView
         android:id="@+id/deadlineLabel"
         android:layout_width="wrap_content"
@@ -74,24 +104,29 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="15dp"
         android:text="Deadline"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/chooseMembersButton" />
 
+    <!-- Deadline Date Input -->
     <EditText
         android:id="@+id/deadlineDateInput"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="10dp"
         android:background="@drawable/searchview_shape"
         android:hint="Select Deadline"
+        android:inputType="text"
+        android:minHeight="48dp"
         android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/deadlineLabel" />
 
-    <!-- Priority Selection -->
+    <!-- Priority Label -->
     <TextView
         android:id="@+id/priorityLabel"
         android:layout_width="wrap_content"
@@ -99,17 +134,22 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="15dp"
         android:text="Priority"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/deadlineDateInput" />
 
+    <!-- Priority Spinner -->
     <Spinner
         android:id="@+id/prioritySpinner"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="10dp"
         android:background="@drawable/searchview_shape"
+        android:minHeight="48dp"
+        android:padding="8dp"
         android:entries="@array/priority_levels"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -117,8 +157,8 @@
 
     <!-- Submit Button -->
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/submittaskButton"
-        android:layout_width="wrap_content"
+        android:id="@+id/submitTaskButton"
+        android:layout_width="175dp"
         android:layout_height="48dp"
         android:layout_marginTop="15dp"
         android:background="@drawable/button_design"
@@ -126,9 +166,7 @@
         android:text="Create Task"
         android:textColor="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.509"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/prioritySpinner"
-        tools:ignore="TouchTargetSize" />
+        app:layout_constraintTop_toBottomOf="@id/prioritySpinner" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

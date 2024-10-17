@@ -33,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     DatabaseReference databaseReference;
     FirebaseAuth auth;
     List<WorkSpaceModel> workSpaceModelList = new ArrayList<>();
+    String role = null;
+    WorkSpaceAdapter workSpaceAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,10 +48,13 @@ public class MainActivity extends AppCompatActivity {
         });
         auth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
+        setAdapter();
+        retrieveWorkSpaces();
         binding.userName.setText(auth.getCurrentUser().getDisplayName());
         Glide.with(this).load(auth.getCurrentUser().getPhotoUrl()).into(binding.userProfile);
+        role = getIntent().getStringExtra("role");
+        binding.Role.setText(role);
         retrieveRole();
-        retrieveWorkSpaces();
         binding.addWorkspace.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -60,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void setAdapter(){
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        WorkSpaceAdapter workSpaceAdapter = new WorkSpaceAdapter(MainActivity.this, workSpaceModelList);
+        workSpaceAdapter = new WorkSpaceAdapter(MainActivity.this, workSpaceModelList);
         binding.recyclerView.setAdapter(workSpaceAdapter);
 
     }
@@ -71,10 +76,9 @@ public class MainActivity extends AppCompatActivity {
                 if(snapshot.exists()){
                     for(DataSnapshot oneWorkSpace : snapshot.getChildren()){
                         WorkSpaceModel workSpaceModel = oneWorkSpace.getValue(WorkSpaceModel.class);
-                        Log.d("workSpaceModelDetails", "onDataChange: " + workSpaceModel.toString());
                         workSpaceModelList.add(workSpaceModel);
+                        workSpaceAdapter.notifyDataSetChanged();
                     }
-                    setAdapter();
                 }
             }
 

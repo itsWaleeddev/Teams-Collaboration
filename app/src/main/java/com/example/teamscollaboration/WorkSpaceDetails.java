@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.activity.EdgeToEdge;
@@ -48,9 +49,9 @@ public class WorkSpaceDetails extends AppCompatActivity {
             return insets;
         });
         workSpaceModel = (WorkSpaceModel) getIntent().getSerializableExtra("workSpace");
+        binding.toolbar.setTitle(workSpaceModel.getWorkSpaceName());
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        binding.toolbar.setTitle(workSpaceModel.getWorkSpaceName());
         Log.d("title", "onCreate: " + workSpaceModel.getWorkSpaceName());
         binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
         auth = FirebaseAuth.getInstance();
@@ -65,6 +66,13 @@ public class WorkSpaceDetails extends AppCompatActivity {
             }
         });
         retrieveTaskData();
+    }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId()==android.R.id.home){
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
     private void retrieveTaskData(){
         databaseReference.child("Tasks").child(workSpaceModel.getWorkSpaceKey()).addListenerForSingleValueEvent(new ValueEventListener() {
