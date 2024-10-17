@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
 import com.example.teamscollaboration.Adapters.WorkSpaceAdapter;
+import com.example.teamscollaboration.Models.UserModel;
 import com.example.teamscollaboration.Models.WorkSpaceModel;
 import com.example.teamscollaboration.databinding.ActivityMainBinding;
 import com.google.firebase.auth.FirebaseAuth;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference();
         binding.userName.setText(auth.getCurrentUser().getDisplayName());
         Glide.with(this).load(auth.getCurrentUser().getPhotoUrl()).into(binding.userProfile);
+        retrieveRole();
         retrieveWorkSpaces();
         binding.addWorkspace.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,6 +78,21 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("databaseError", "onCancelled: " + error.getMessage());
+            }
+        });
+    }
+    private void retrieveRole(){
+        databaseReference.child("Users").child(auth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    UserModel userModel = snapshot.getValue(UserModel.class);
+                    binding.Role.setText(userModel.getRole());
+                }
+            }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.d("databaseError", "onCancelled: " + error.getMessage());
