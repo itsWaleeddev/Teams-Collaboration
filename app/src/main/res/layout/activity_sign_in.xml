@@ -104,6 +104,7 @@
         android:layout_marginTop="15dp"
         android:text="Already have an account?"
         android:textAlignment="center"
+        android:textColor="@android:color/system_primary_container_dark"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="@+id/googleSignIn"
         app:layout_constraintStart_toStartOf="@+id/googleSignIn"
