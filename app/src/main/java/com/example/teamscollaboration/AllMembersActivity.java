@@ -1,5 +1,6 @@
 package com.example.teamscollaboration;
 
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -41,6 +42,9 @@ public class AllMembersActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        setSupportActionBar(binding.toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
         auth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
         retrieveMembers();

@@ -2,9 +2,10 @@ package com.example.teamscollaboration.Models;
 
 import com.example.teamscollaboration.Adapters.MembersModel;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class WorkSpaceModel {
+public class WorkSpaceModel implements Serializable {
     String workSpaceName = null;
     String workSpaceDescription = null;
     String deadLine = null;
@@ -29,6 +30,21 @@ public class WorkSpaceModel {
     }
 
     public WorkSpaceModel() {
+    }
+
+    @Override
+    public String toString() {
+        return "WorkSpaceModel{" +
+                "workSpaceName='" + workSpaceName + '\'' +
+                ", workSpaceDescription='" + workSpaceDescription + '\'' +
+                ", deadLine='" + deadLine + '\'' +
+                ", priority='" + priority + '\'' +
+                ", created_at=" + created_at +
+                ", adminId='" + adminId + '\'' +
+                ", membersList=" + membersList +
+                ", TeamLeader='" + TeamLeader + '\'' +
+                ", workSpaceKey='" + workSpaceKey + '\'' +
+                '}';
     }
 
     public String getWorkSpaceKey() {

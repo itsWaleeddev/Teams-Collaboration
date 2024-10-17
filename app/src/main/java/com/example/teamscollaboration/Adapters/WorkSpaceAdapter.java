@@ -13,8 +13,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.teamscollaboration.AllMembersActivity;
 import com.example.teamscollaboration.Models.WorkSpaceModel;
+import com.example.teamscollaboration.WorkSpaceDetails;
 import com.example.teamscollaboration.databinding.ItemWorkspaceBinding;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +49,14 @@ public class WorkSpaceAdapter extends RecyclerView.Adapter<WorkSpaceAdapter.View
             public void onClick(View view) {
                 Intent intent = new Intent(context, AllMembersActivity.class);
                 intent.putExtra("workSpaceKey", workSpaceModel.getWorkSpaceKey());
+                context.startActivity(intent);
+            }
+        });
+        holder.binding.viewWorkspaceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, WorkSpaceDetails.class);
+                intent.putExtra("workSpace", (Serializable) workSpaceModel);
                 context.startActivity(intent);
             }
         });

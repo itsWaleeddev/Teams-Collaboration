@@ -5,12 +5,13 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -18,29 +19,30 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.teamscollaboration.Adapters.MembersModel;
+import com.example.teamscollaboration.Models.TasksModel;
 import com.example.teamscollaboration.Models.WorkSpaceModel;
-import com.example.teamscollaboration.databinding.ActivityAddWorkSpaceBinding;
+import com.example.teamscollaboration.databinding.ActivityAddTaskBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import org.checkerframework.checker.units.qual.A;
-
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class AddWorkSpace extends AppCompatActivity {
-    ActivityAddWorkSpaceBinding binding;
+public class AddTaskActivity extends AppCompatActivity {
+    ActivityAddTaskBinding binding;
+    WorkSpaceModel workSpaceModel;
+    List<MembersModel> selectedMembers = new ArrayList<>();
     FirebaseAuth auth;
     DatabaseReference databaseReference;
-    String workSpaceName = null;
-    String workSpaceDescription = null;
-    String deadLine = null;
+    String taskName = null;
+    String taskDescription = null;
+    String taskDeadline = null;
     String priority = null;
-    String created_at = null;
-    List<MembersModel> selectedMembers = new ArrayList<>();
+    String workSpaceKey = null;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -52,12 +54,11 @@ public class AddWorkSpace extends AppCompatActivity {
             }
         }
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        binding = ActivityAddWorkSpaceBinding.inflate(getLayoutInflater());
+        binding = ActivityAddTaskBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -66,56 +67,58 @@ public class AddWorkSpace extends AppCompatActivity {
         });
         auth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
+        workSpaceModel = (WorkSpaceModel) getIntent().getSerializableExtra("workSpace");
+        workSpaceKey = workSpaceModel.getWorkSpaceKey();
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-        binding.chooseMembersButton.setOnClickListener(new View.OnClickListener() {
+        binding.submittaskButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(AddWorkSpace.this, ChooseMembers.class);
-                startActivityForResult(intent, 0);
-            }
-        });
-        binding.deadlineDateInput.setInputType(InputType.TYPE_NULL);
-        binding.deadlineDateInput.setFocusable(false);
-        binding.deadlineDateInput.setFocusableInTouchMode(false);
-        binding.deadlineDateInput.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showDatePickerDialog();
-            }
-        });
-        binding.submitWorkspaceButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                workSpaceName = binding.workspaceNameInput.getText().toString().trim();
-                workSpaceDescription = binding.workspaceDescriptionInput.getText().toString().trim();
-                deadLine = binding.deadlineDateInput.getText().toString().trim();
+                taskName = binding.taskNameInput.getText().toString().trim();
+                taskDescription = binding.taskDescriptionInput.getText().toString().trim();
+                taskDeadline = binding.deadlineDateInput.getText().toString().trim();
                 priority = binding.prioritySpinner.getSelectedItem().toString().trim();
-                if(workSpaceName.isEmpty()){
-                    binding.workspaceNameInput.setError("Please fill this field");
+                if(taskName.isEmpty()){
+                    binding.taskNameInput.setError("Please fill this field");
                 }
-                else if(workSpaceDescription.isEmpty()){
-                    binding.workspaceDescriptionInput.setError("Please fill this field");
+                else if(taskDescription.isEmpty()){
+                    binding.taskDescriptionInput.setError("Please fill this field");
                 }
-                else if(deadLine.isEmpty()){
+                else if(taskDeadline.isEmpty()){
                     binding.deadlineDateInput.setError("Please fill this field");
                 }
                 else{
                     saveWorkSpace();
-                    Toast.makeText(AddWorkSpace.this, "WorkSpace Created Successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddTaskActivity.this, "Task Created Successfully", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+        binding.chooseMembersButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(AddTaskActivity.this, TasksMembers.class);
+                intent.putExtra("workSpace", (Serializable) workSpaceModel);
+                startActivityForResult(intent, 0);
+            }
+        });
+        binding.deadlineDateInput.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                binding.deadlineDateInput.setInputType(InputType.TYPE_NULL);
+                showDatePickerDialog();
+            }
+        });
     }
-    private void saveWorkSpace(){
-        DatabaseReference workSpaceRef = databaseReference.child("Workspaces");
-        String newWorkSpaceKey = workSpaceRef.push().getKey();
-        WorkSpaceModel workSpaceModel = new WorkSpaceModel(newWorkSpaceKey,workSpaceName, workSpaceDescription,
-                deadLine, priority, System.currentTimeMillis(), auth.getCurrentUser().getUid(),selectedMembers, null);
-        workSpaceRef.child(newWorkSpaceKey).setValue(workSpaceModel);
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId()==android.R.id.home){
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
-    // DatePickerDialog method
+
     private void showDatePickerDialog() {
         DatePickerDialog datePickerDialog = new DatePickerDialog(this,
                 new DatePickerDialog.OnDateSetListener() {
@@ -138,5 +141,13 @@ public class AddWorkSpace extends AppCompatActivity {
                 Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
 
         datePickerDialog.show();
+    }
+    private void saveWorkSpace(){
+        DatabaseReference tasksRef = databaseReference.child("Tasks").child(workSpaceKey);
+        String newTaskKey = tasksRef.push().getKey();
+        TasksModel tasksModel = new TasksModel(newTaskKey, taskName,taskDescription, taskDeadline,
+                 priority, System.currentTimeMillis(), auth.getCurrentUser().getUid(),
+                selectedMembers, null, workSpaceKey, "pending");
+       tasksRef.child(newTaskKey).setValue(tasksModel);
     }
 }

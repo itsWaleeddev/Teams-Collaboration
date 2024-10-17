@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TaskDetailsActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Task Name -->
+            <TextView
+                android:id="@+id/tv_task_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="Task Name"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- Task Creation Date and Deadline in a Horizontal Line with 4 TextViews -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- Creation Label -->
+                <TextView
+                    android:id="@+id/tv_creation_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Created on:"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+                <!-- Creation Date -->
+                <TextView
+                    android:id="@+id/tv_task_creation_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="2024-10-18"
+                    android:textColor="@color/black" />
+
+                <!-- Deadline Label -->
+                <TextView
+                    android:id="@+id/tv_deadline_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Deadline:"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+                <!-- Deadline Date -->
+                <TextView
+                    android:id="@+id/tv_task_deadline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="2024-11-01"
+                    android:textColor="@color/black" />
+            </LinearLayout>
+
+            <!-- Task Description -->
+            <TextView
+                android:id="@+id/tv_task_description_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Description:"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_task_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+                android:textColor="@color/black" />
+
+            <!-- RecyclerView for Selected Members -->
+            <TextView
+                android:id="@+id/tv_selected_members_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Selected Members:"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_selected_members"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_marginBottom="16dp"
+                android:background="@color/white" />
+
+            <!-- Start Time and End Time in a Horizontal Line with 4 TextViews -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- Start Time Label -->
+                <TextView
+                    android:id="@+id/tv_start_time_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Start Time:"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+                <!-- Start Time -->
+                <TextView
+                    android:id="@+id/tv_task_start_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="09:00 AM"
+                    android:textColor="@color/black" />
+
+                <!-- End Time Label -->
+                <TextView
+                    android:id="@+id/tv_end_time_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="End Time:"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+                <!-- End Time -->
+                <TextView
+                    android:id="@+id/tv_task_end_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="05:00 PM"
+                    android:textColor="@color/black" />
+            </LinearLayout>
+
+            <!-- Daily Hours Spent on Task -->
+            <TextView
+                android:id="@+id/tv_daily_hours_spent_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Daily Hours Spent:"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_daily_hours_spent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="7 hours"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
