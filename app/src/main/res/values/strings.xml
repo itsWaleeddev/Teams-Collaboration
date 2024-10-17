@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Teams Collaboration</string>
+    <string name="default_web_client_id">935297653197-pqgo5n26mc6sduccoect25lhqnae8197.apps.googleusercontent.com</string>
+    <string-array name="priority_levels">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+    </string-array>
+    <string-array name="role_options">
+        <item>Admin</item>
+        <item>Team Leader</item>
+        <item>Team Member</item>
+    </string-array>
+</resources>
