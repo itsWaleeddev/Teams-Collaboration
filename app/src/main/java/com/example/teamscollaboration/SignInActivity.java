@@ -3,6 +3,7 @@ package com.example.teamscollaboration;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.service.autofill.UserData;
 import android.util.Log;
@@ -29,6 +30,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -40,6 +43,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.Objects;
 
@@ -47,13 +53,13 @@ public class SignInActivity extends AppCompatActivity {
     ActivitySignInBinding binding;
     GoogleSignInClient googleSignInClient;
     DatabaseReference databaseReference;
+    StorageReference storageReference;
     FirebaseAuth auth;
     String name = null;
     String role = null;
     String uId = null;
     String email = null;
-
-
+    Uri userImage = null;
     @Override
     protected void onStart() {
         super.onStart();
@@ -76,6 +82,7 @@ public class SignInActivity extends AppCompatActivity {
         });
         auth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
+        storageReference = FirebaseStorage.getInstance().getReference();
 
         //setting google sign in options
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -87,8 +94,6 @@ public class SignInActivity extends AppCompatActivity {
         binding.googleSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                name = null;
-                role = null;
                 name = binding.name.getText().toString().trim();
                 role = binding.role.getSelectedItem().toString().trim();
                 Log.d("nameCheck", "onClick: " + name);
@@ -169,10 +174,34 @@ public class SignInActivity extends AppCompatActivity {
         role = binding.role.getSelectedItem().toString().trim();
         uId = auth.getCurrentUser().getUid();
         email = auth.getCurrentUser().getEmail();
-        UserModel usermodel = new UserModel(uId, name, role, email);
-        if (auth.getCurrentUser() != null) {
-            databaseReference.child("Users").child(uId).setValue(usermodel);
-        }
+        userImage = auth.getCurrentUser().getPhotoUrl();
+        StorageReference imageRef = storageReference.child("User_Image/"+uId+".jpg");
+        UploadTask uploadTask = imageRef.putFile(userImage);
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        UserModel usermodel = new UserModel(uId, name, role, email, userImage.toString());
+                        if (auth.getCurrentUser() != null) {
+                            databaseReference.child("Users").child(uId).setValue(usermodel);
+                        }
+                        Log.d("uploadData", "onSuccess: " + "Data uploaded Successfully");
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("uploadData", "onSuccess: " + "Data uploading Failed");
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("uploadData", "onFailure: " + "Image Uploaded Failed");
+            }
+        });
     }
 
     private void checkUserExistence(UserExistenceCallback callback) {

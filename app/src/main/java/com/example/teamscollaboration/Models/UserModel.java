@@ -5,25 +5,25 @@ public class UserModel {
     String name = null;
     String role = null;
     String email = null;
+    String userImage = null;
 
-    public UserModel(String userId, String name, String role, String email) {
+    public UserModel(String userId, String name, String role, String email, String userImage) {
         this.userId = userId;
         this.name = name;
         this.role = role;
         this.email = email;
+        this.userImage = userImage;
     }
 
     public UserModel() {
     }
 
-    @Override
-    public String toString() {
-        return "UserModel{" +
-                "userId='" + userId + '\'' +
-                ", name='" + name + '\'' +
-                ", role='" + role + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+    public String getUserImage() {
+        return userImage;
+    }
+
+    public void setUserImage(String userImage) {
+        this.userImage = userImage;
     }
 
     public String getUserId() {
