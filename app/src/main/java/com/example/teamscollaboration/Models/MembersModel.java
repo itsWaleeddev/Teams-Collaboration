@@ -1,4 +1,4 @@
-package com.example.teamscollaboration.Adapters;
+package com.example.teamscollaboration.Models;
 
 import java.io.Serializable;
 

@@ -16,7 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.teamscollaboration.Adapters.ChooseMembersAdapter;
-import com.example.teamscollaboration.Adapters.MembersModel;
+import com.example.teamscollaboration.Models.MembersModel;
 import com.example.teamscollaboration.databinding.ActivityChooseMembersBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;

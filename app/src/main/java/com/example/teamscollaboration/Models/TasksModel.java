@@ -1,7 +1,5 @@
 package com.example.teamscollaboration.Models;
 
-import com.example.teamscollaboration.Adapters.MembersModel;
-
 import java.io.Serializable;
 import java.util.List;
 

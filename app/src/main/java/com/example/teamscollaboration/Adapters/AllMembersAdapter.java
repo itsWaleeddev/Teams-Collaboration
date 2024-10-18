@@ -7,17 +7,16 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.teamscollaboration.Models.MembersModel;
 import com.example.teamscollaboration.Models.WorkSpaceModel;
 import com.example.teamscollaboration.R;
 import com.example.teamscollaboration.databinding.ItemAllmembersBinding;
-import com.example.teamscollaboration.databinding.ItemMemberBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,7 +24,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class AllMembersAdapter extends RecyclerView.Adapter<AllMembersAdapter.ViewHolder> {
@@ -70,9 +68,9 @@ public class AllMembersAdapter extends RecyclerView.Adapter<AllMembersAdapter.Vi
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         if (item.getItemId() == R.id.assign_team_leader) {
-                            databaseReference.child("Users").child(member.uID).child("role").setValue("Team Leader");
+                            databaseReference.child("Users").child(member.getuID()).child("role").setValue("Team Leader");
                             DatabaseReference workspacesRef = databaseReference.child("Workspaces").child(workSpaceModel.getWorkSpaceKey()).child("membersList");
-                            updateRole(workspacesRef, member.uID);
+                            updateRole(workspacesRef, member.getuID());
                             databaseReference.child("Workspaces").child(workSpaceModel.getWorkSpaceKey()).child("teamLeader").setValue(member.getName());
                             Toast.makeText(view.getContext(), "Assigned as Team Leader", Toast.LENGTH_SHORT).show();
                             return true;

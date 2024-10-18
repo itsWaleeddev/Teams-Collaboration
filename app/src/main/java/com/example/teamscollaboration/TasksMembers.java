@@ -14,7 +14,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.example.teamscollaboration.Adapters.MembersModel;
+import com.example.teamscollaboration.Models.MembersModel;
 import com.example.teamscollaboration.Adapters.TasksMembersAdapter;
 import com.example.teamscollaboration.Models.WorkSpaceModel;
 import com.example.teamscollaboration.databinding.ActivityTasksMembersBinding;

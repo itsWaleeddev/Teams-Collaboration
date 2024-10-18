@@ -8,9 +8,8 @@ import android.widget.CompoundButton;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.teamscollaboration.Models.WorkSpaceModel;
+import com.example.teamscollaboration.Models.MembersModel;
 import com.example.teamscollaboration.databinding.ItemMemberBinding;
-import com.example.teamscollaboration.databinding.ItemWorkspaceBinding;
 
 import java.util.ArrayList;
 import java.util.List;
