@@ -23,10 +23,12 @@ import java.util.List;
 public class WorkSpaceAdapter extends RecyclerView.Adapter<WorkSpaceAdapter.ViewHolder> {
     private Context context;
     List<WorkSpaceModel> workSpaceModelList;
+    String role = null;
 
-    public WorkSpaceAdapter(Context context,  List<WorkSpaceModel> workSpaceModelList) {
+    public WorkSpaceAdapter(Context context,  List<WorkSpaceModel> workSpaceModelList, String role) {
         this.context = context;
         this.workSpaceModelList = workSpaceModelList;
+        this.role = role;
     }
 
     // where to get the single card as a viewholder object
@@ -42,6 +44,9 @@ public class WorkSpaceAdapter extends RecyclerView.Adapter<WorkSpaceAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         WorkSpaceModel workSpaceModel = workSpaceModelList.get(position);
+        if(role.equals("Team Member")){
+            holder.binding.showMembersButton.setVisibility(View.GONE);
+        }
         holder.binding.workspaceName.setText(workSpaceModel.getWorkSpaceName());
         holder.binding.workspaceDescription.setText(workSpaceModel.getWorkSpaceDescription());
         holder.binding.deadline.setText(workSpaceModel.getDeadLine());
