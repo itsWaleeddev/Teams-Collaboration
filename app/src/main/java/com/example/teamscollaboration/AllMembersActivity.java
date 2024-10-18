@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.teamscollaboration.Adapters.AllMembersAdapter;
 import com.example.teamscollaboration.Adapters.MembersModel;
+import com.example.teamscollaboration.Models.WorkSpaceModel;
 import com.example.teamscollaboration.databinding.ActivityAllMembersBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -27,11 +28,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AllMembersActivity extends AppCompatActivity {
-    ActivityAllMembersBinding  binding;
+    ActivityAllMembersBinding binding;
     FirebaseAuth auth;
     DatabaseReference databaseReference;
     String workSpaceKey = null;
     List<MembersModel> membersModelList = new ArrayList<>();
+    WorkSpaceModel workSpaceModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,22 +53,24 @@ public class AllMembersActivity extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference();
         retrieveMembers();
     }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId()==android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             finish();
         }
         return super.onOptionsItemSelected(item);
     }
-    private void retrieveMembers(){
+
+    private void retrieveMembers() {
         workSpaceKey = getIntent().getStringExtra("workSpaceKey");
-        databaseReference.child("Workspaces").child(workSpaceKey).child("membersList").addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child("Workspaces").child(workSpaceKey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                        MembersModel membersModel = dataSnapshot.getValue(MembersModel.class);
-                        membersModelList.add(membersModel);
+                if (snapshot.exists()) {
+                    workSpaceModel = snapshot.getValue(WorkSpaceModel.class);
+                    if (workSpaceModel != null) {
+                        membersModelList = workSpaceModel.getMembersList();
                     }
                     setAdapter();
                 }
@@ -77,9 +82,10 @@ public class AllMembersActivity extends AppCompatActivity {
             }
         });
     }
-    private void setAdapter(){
+
+    private void setAdapter() {
         binding.myRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        AllMembersAdapter adapter = new AllMembersAdapter(this, membersModelList);
+        AllMembersAdapter adapter = new AllMembersAdapter(this, membersModelList, workSpaceModel);
         binding.myRecyclerView.setAdapter(adapter);
     }
 }

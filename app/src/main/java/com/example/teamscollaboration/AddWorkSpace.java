@@ -143,7 +143,7 @@ public class AddWorkSpace extends AppCompatActivity {
         DatabaseReference workSpaceRef = databaseReference.child("Workspaces");
         String newWorkSpaceKey = workSpaceRef.push().getKey();
         WorkSpaceModel workSpaceModel = new WorkSpaceModel(newWorkSpaceKey,workSpaceName, workSpaceDescription,
-                deadLine, priority, System.currentTimeMillis(), auth.getCurrentUser().getUid(),selectedMembers, null);
+                deadLine, priority, System.currentTimeMillis(), auth.getCurrentUser().getUid(),selectedMembers, "No Leader Yet");
         workSpaceRef.child(newWorkSpaceKey).setValue(workSpaceModel);
     }
     // DatePickerDialog method

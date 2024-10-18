@@ -1,5 +1,7 @@
 package com.example.teamscollaboration.Adapters;
+
 import android.content.Context;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -12,12 +14,16 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.teamscollaboration.Models.WorkSpaceModel;
 import com.example.teamscollaboration.R;
 import com.example.teamscollaboration.databinding.ItemAllmembersBinding;
 import com.example.teamscollaboration.databinding.ItemMemberBinding;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +33,12 @@ public class AllMembersAdapter extends RecyclerView.Adapter<AllMembersAdapter.Vi
     List<MembersModel> selectedMembersList;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+    WorkSpaceModel workSpaceModel;
 
-    public AllMembersAdapter(Context context, List<MembersModel> selectedMembersList) {
+    public AllMembersAdapter(Context context, List<MembersModel> selectedMembersList, WorkSpaceModel workSpaceModel) {
         this.context = context;
         this.selectedMembersList = selectedMembersList;
+        this.workSpaceModel = workSpaceModel;
     }
 
     // where to get the single card as a viewholder object
@@ -63,6 +71,9 @@ public class AllMembersAdapter extends RecyclerView.Adapter<AllMembersAdapter.Vi
                     public boolean onMenuItemClick(MenuItem item) {
                         if (item.getItemId() == R.id.assign_team_leader) {
                             databaseReference.child("Users").child(member.uID).child("role").setValue("Team Leader");
+                            DatabaseReference workspacesRef = databaseReference.child("Workspaces").child(workSpaceModel.getWorkSpaceKey()).child("membersList");
+                            updateRole(workspacesRef, member.uID);
+                            databaseReference.child("Workspaces").child(workSpaceModel.getWorkSpaceKey()).child("teamLeader").setValue(member.getName());
                             Toast.makeText(view.getContext(), "Assigned as Team Leader", Toast.LENGTH_SHORT).show();
                             return true;
                         } else {
@@ -83,6 +94,32 @@ public class AllMembersAdapter extends RecyclerView.Adapter<AllMembersAdapter.Vi
     @Override
     public int getItemCount() {
         return selectedMembersList.size();
+    }
+
+    private void updateRole(DatabaseReference workSpaceRef, String uID) {
+        workSpaceRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot memberSnapshot : snapshot.getChildren()) {
+                        // Retrieve each member object
+                        MembersModel member = memberSnapshot.getValue(MembersModel.class);
+
+                        // Check if the member's uId matches the current user's uId
+                        if (member != null && member.getuID().equals(uID)) {
+                            // Update the role for this member
+                            memberSnapshot.getRef().child("role").setValue("Team Leader");
+                            break; // Once the match is found and updated, exit the loop
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("FirebaseError", "onCancelled: " + error.getMessage());
+            }
+        });
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

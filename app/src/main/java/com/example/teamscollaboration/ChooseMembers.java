@@ -86,7 +86,7 @@ public class ChooseMembers extends AppCompatActivity {
                         String uID = oneSnapShot.child("userId").getValue(String.class);
                         String email = oneSnapShot.child("email").getValue(String.class);
                         if (!role.equals("Admin")) {
-                            membersModelList.add(new MembersModel(email, uID, name, false));
+                            membersModelList.add(new MembersModel(email, uID, name, false, role));
                             adapter.notifyDataSetChanged();
                         }
                     }

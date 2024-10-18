@@ -53,7 +53,9 @@ public class MainActivity extends AppCompatActivity {
         binding.userName.setText(auth.getCurrentUser().getDisplayName());
         Glide.with(this).load(auth.getCurrentUser().getPhotoUrl()).into(binding.userProfile);
         role = getIntent().getStringExtra("role");
-        binding.Role.setText(role);
+        if(role!=null){
+            binding.Role.setText(role);
+        }
         retrieveRole();
         binding.addWorkspace.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,6 +97,9 @@ public class MainActivity extends AppCompatActivity {
                 if(snapshot.exists()){
                     UserModel userModel = snapshot.getValue(UserModel.class);
                     binding.Role.setText(userModel.getRole());
+                    if(userModel.getRole().equals("Team Member") || userModel.getRole().equals("Team Leader")){
+                        binding.addWorkspace.setVisibility(View.GONE);
+                    }
                 }
             }
             @Override

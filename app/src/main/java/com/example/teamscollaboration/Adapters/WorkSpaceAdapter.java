@@ -44,6 +44,8 @@ public class WorkSpaceAdapter extends RecyclerView.Adapter<WorkSpaceAdapter.View
         WorkSpaceModel workSpaceModel = workSpaceModelList.get(position);
         holder.binding.workspaceName.setText(workSpaceModel.getWorkSpaceName());
         holder.binding.workspaceDescription.setText(workSpaceModel.getWorkSpaceDescription());
+        holder.binding.deadline.setText(workSpaceModel.getDeadLine());
+        holder.binding.leaderName.setText(workSpaceModel.getTeamLeader());
         holder.binding.showMembersButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.teamscollaboration.Adapters.WorkSpaceAdapter;
 import com.example.teamscollaboration.Adapters.WorkSpaceDetailsAdapter;
 import com.example.teamscollaboration.Models.TasksModel;
+import com.example.teamscollaboration.Models.UserModel;
 import com.example.teamscollaboration.Models.WorkSpaceModel;
 import com.example.teamscollaboration.databinding.ActivityWorkSpaceDetailsBinding;
 import com.google.firebase.auth.FirebaseAuth;
@@ -56,7 +57,6 @@ public class WorkSpaceDetails extends AppCompatActivity {
         binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
         auth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
-        Log.d("crashCheck", "onCreate: " + workSpaceModel.toString());
         binding.addTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -65,6 +65,7 @@ public class WorkSpaceDetails extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        retrieveRole();
         retrieveTaskData();
     }
     @Override
@@ -97,6 +98,22 @@ public class WorkSpaceDetails extends AppCompatActivity {
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         WorkSpaceDetailsAdapter workSpaceDetailsAdapter = new WorkSpaceDetailsAdapter(WorkSpaceDetails.this, tasksModelList);
         binding.recyclerView.setAdapter(workSpaceDetailsAdapter);
-
+    }
+    private void retrieveRole(){
+        databaseReference.child("Users").child(auth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    UserModel userModel = snapshot.getValue(UserModel.class);
+                    if(userModel.getRole().equals("Team Member")){
+                        binding.addTask.setVisibility(View.GONE);
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("databaseError", "onCancelled: " + error.getMessage());
+            }
+        });
     }
 }

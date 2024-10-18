@@ -7,15 +7,25 @@ public class MembersModel implements Serializable {
     String email = null;
     String name = null;
     Boolean isChecked = false;
+    String role = null;
 
-    public MembersModel(String email, String uID, String name, Boolean isChecked) {
+    public MembersModel(String email, String uID, String name, Boolean isChecked, String role) {
         this.email = email;
         this.uID = uID;
         this.name = name;
         this.isChecked = isChecked;
+        this.role = role;
     }
 
     public MembersModel() {
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getEmail() {

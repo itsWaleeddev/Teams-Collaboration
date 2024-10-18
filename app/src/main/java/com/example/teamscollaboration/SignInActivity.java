@@ -109,7 +109,7 @@ public class SignInActivity extends AppCompatActivity {
             }
         });
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, R.layout.spinner_item,
-                getResources().getTextArray(R.array.priority_levels)) {
+                getResources().getTextArray(R.array.role_options)) {
             @Override
             public View getDropDownView(int position, View convertView, ViewGroup parent) {
                 View view = super.getDropDownView(position, convertView, parent);
