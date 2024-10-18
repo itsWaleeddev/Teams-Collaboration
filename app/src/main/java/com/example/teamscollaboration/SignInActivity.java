@@ -2,10 +2,13 @@ package com.example.teamscollaboration;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.service.autofill.UserData;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -73,11 +76,14 @@ public class SignInActivity extends AppCompatActivity {
         });
         auth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
+
         //setting google sign in options
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
+
         //initialize google sign in client
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
+
         binding.googleSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -94,6 +100,7 @@ public class SignInActivity extends AppCompatActivity {
                 }
             }
         });
+
         binding.alreadyAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,8 +108,17 @@ public class SignInActivity extends AppCompatActivity {
                 launcher.launch(signInIntent);
             }
         });
+        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, R.layout.spinner_item,
+                getResources().getTextArray(R.array.priority_levels)) {
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                view.setBackgroundColor(Color.WHITE); // Set the background color of the dropdown
+                return view;
+            }
+        };
+        binding.role.setAdapter(adapter);
     }
-
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
                 @Override
@@ -182,5 +198,4 @@ public class SignInActivity extends AppCompatActivity {
     public interface UserExistenceCallback {
         void onUserExistenceChecked(boolean exists);
     }
-
 }

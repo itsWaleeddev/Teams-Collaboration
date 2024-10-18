@@ -125,7 +125,8 @@ public class AddTaskActivity extends AppCompatActivity {
                 showDatePickerDialog();
             }
         });
-        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, R.layout.spinner_item, getResources().getTextArray(R.array.priority_levels)) {
+        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, R.layout.spinner_item,
+                getResources().getTextArray(R.array.priority_levels)) {
             @Override
             public View getDropDownView(int position, View convertView, ViewGroup parent) {
                 View view = super.getDropDownView(position, convertView, parent);
