@@ -8,13 +8,15 @@ public class MembersModel implements Serializable {
     String name = null;
     Boolean isChecked = false;
     String role = null;
+    String userImage = null;
 
-    public MembersModel(String email, String uID, String name, Boolean isChecked, String role) {
+    public MembersModel(String email, String uID, String name, Boolean isChecked, String role, String userImage) {
         this.email = email;
         this.uID = uID;
         this.name = name;
         this.isChecked = isChecked;
         this.role = role;
+        this.userImage = userImage;
     }
 
     public MembersModel() {
@@ -22,6 +24,14 @@ public class MembersModel implements Serializable {
 
     public String getRole() {
         return role;
+    }
+
+    public String getUserImage() {
+        return userImage;
+    }
+
+    public void setUserImage(String userImage) {
+        this.userImage = userImage;
     }
 
     public void setRole(String role) {

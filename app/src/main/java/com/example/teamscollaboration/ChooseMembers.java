@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -59,6 +60,7 @@ public class ChooseMembers extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 selectedMembers = adapter.getSelectedMembers();
+                Toast.makeText(ChooseMembers.this, "Members Selected Successfully", Toast.LENGTH_SHORT).show();
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("selectedMembers", (Serializable) selectedMembers);
                 setResult(RESULT_OK, resultIntent);
@@ -85,8 +87,9 @@ public class ChooseMembers extends AppCompatActivity {
                         String role = oneSnapShot.child("role").getValue(String.class);
                         String uID = oneSnapShot.child("userId").getValue(String.class);
                         String email = oneSnapShot.child("email").getValue(String.class);
+                        String imageUrl = oneSnapShot.child("userImage").getValue(String.class);
                         if (!role.equals("Admin")) {
-                            membersModelList.add(new MembersModel(email, uID, name, false, role));
+                            membersModelList.add(new MembersModel(email, uID, name, false, role, imageUrl));
                             adapter.notifyDataSetChanged();
                         }
                     }

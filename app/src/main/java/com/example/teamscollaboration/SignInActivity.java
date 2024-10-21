@@ -3,6 +3,7 @@ package com.example.teamscollaboration;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.service.autofill.UserData;
@@ -18,11 +19,15 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.teamscollaboration.Models.UserModel;
 import com.example.teamscollaboration.databinding.ActivitySignInBinding;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -47,6 +52,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
 import java.util.Objects;
 
 public class SignInActivity extends AppCompatActivity {
@@ -146,7 +152,6 @@ public class SignInActivity extends AppCompatActivity {
                                                 } else {
                                                     saveUserData();
                                                     Toast.makeText(SignInActivity.this, "Successfully signed-in with Google", Toast.LENGTH_SHORT).show();
-                                                    updateUi();
                                                 }
                                             }
                                         });
@@ -175,31 +180,48 @@ public class SignInActivity extends AppCompatActivity {
         uId = auth.getCurrentUser().getUid();
         email = auth.getCurrentUser().getEmail();
         userImage = auth.getCurrentUser().getPhotoUrl();
-        StorageReference imageRef = storageReference.child("User_Image/"+uId+".jpg");
-        UploadTask uploadTask = imageRef.putFile(userImage);
-        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        Glide.with(this).asFile().load(userImage).into(new CustomTarget<File>() {
             @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            public void onResourceReady(@NonNull File resource, @Nullable Transition<? super File> transition) {
+                StorageReference imageRef = storageReference.child("User_Image/"+uId+".jpg");
+                Uri fileUri = Uri.fromFile(resource);
+                UploadTask uploadTask = imageRef.putFile(fileUri);
+                uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
-                    public void onSuccess(Uri uri) {
-                        UserModel usermodel = new UserModel(uId, name, role, email, userImage.toString());
-                        if (auth.getCurrentUser() != null) {
-                            databaseReference.child("Users").child(uId).setValue(usermodel);
-                        }
-                        Log.d("uploadData", "onSuccess: " + "Data uploaded Successfully");
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                UserModel usermodel = new UserModel(uId, name, role, email, userImage.toString());
+                                if (auth.getCurrentUser() != null) {
+                                    databaseReference.child("Users").child(uId).setValue(usermodel).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            updateUi();
+                                            Log.d("uploadData", "onSuccess: " + "Data uploaded Successfully");
+                                        }
+                                    });
+
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d("uploadData", "onSuccess: " + "Data uploading Failed");
+                            }
+                        });
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.d("uploadData", "onSuccess: " + "Data uploading Failed");
+                        Log.d("uploadData", "onFailure: " + "Image Uploaded Failed" + e.getMessage());
                     }
                 });
             }
-        }).addOnFailureListener(new OnFailureListener() {
+
             @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d("uploadData", "onFailure: " + "Image Uploaded Failed");
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+
             }
         });
     }

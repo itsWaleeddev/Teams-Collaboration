@@ -41,6 +41,7 @@ import nl.joery.animatedbottombar.AnimatedBottomBar;
 
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
+    private boolean isDataFetched = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(int i, @Nullable AnimatedBottomBar.Tab tab, int i1, @NonNull AnimatedBottomBar.Tab tab1) {
                 Fragment selectedFragment = null;
-
                 // Switch between fragments based on the selected tab's index
                 switch (i1) {
                     case 0:
@@ -90,9 +90,10 @@ public class MainActivity extends AppCompatActivity {
                             .commit();
                 }
             }
+
             @Override
             public void onTabReselected(int i, @NonNull AnimatedBottomBar.Tab tab) {
-                    //reselection logic if needed
+                //reselection logic if needed
             }
         });
     }

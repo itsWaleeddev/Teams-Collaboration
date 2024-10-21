@@ -56,12 +56,11 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        binding.userName.setText(auth.getCurrentUser().getDisplayName());
-        Glide.with(this).load(auth.getCurrentUser().getPhotoUrl()).into(binding.userProfile);
-        retrieveRole();
-        setAdapter();
-        retrieveWorkSpaces();
-
+        if (isAdded() && getActivity() != null) {
+            binding.userName.setText(auth.getCurrentUser().getDisplayName());
+            Glide.with(this).load(auth.getCurrentUser().getPhotoUrl()).into(binding.userProfile);
+            retrieveRole();
+        }
     }
 
     private void retrieveRole() {
@@ -72,6 +71,10 @@ public class HomeFragment extends Fragment {
                     UserModel userModel = snapshot.getValue(UserModel.class);
                     binding.Role.setText(userModel.getRole());
                     role = userModel.getRole();
+                    if (role != null) {
+                        setAdapter();
+                        retrieveWorkSpaces();
+                    }
                 }
             }
 
@@ -90,15 +93,14 @@ public class HomeFragment extends Fragment {
     }
 
     private void retrieveWorkSpaces() {
-        if(role.equals("Admin")){
+        if (role.equals("Admin")) {
             retrieveAdminWorkSpaces();
-        }
-        else{
+        } else {
             retrieveTeamWorkSpaces();
         }
     }
 
-    private void retrieveAdminWorkSpaces(){
+    private void retrieveAdminWorkSpaces() {
         DatabaseReference workspaceRef = FirebaseDatabase.getInstance().getReference("Workspaces");
         // Query workspaces where adminId matches a specific value
         Query query = workspaceRef.orderByChild("adminId").equalTo(auth.getCurrentUser().getUid());
@@ -111,9 +113,9 @@ public class HomeFragment extends Fragment {
                         WorkSpaceModel workspace = workspaceSnapshot.getValue(WorkSpaceModel.class);
                         workSpaceModelList.add(workspace);
                         workSpaceAdapter.notifyDataSetChanged();
-                        // Use the workspace object
                     }
-                } else {
+                }
+                 else {
                     // Handle no matching workspaces
                     Toast.makeText(requireContext(), "No workspace found", Toast.LENGTH_SHORT).show();
                 }
@@ -128,7 +130,7 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private void retrieveTeamWorkSpaces(){
+    private void retrieveTeamWorkSpaces() {
         DatabaseReference workspaceRef = FirebaseDatabase.getInstance().getReference("Workspaces");
         // Listen to all workspaces
         workspaceRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -149,10 +151,11 @@ public class HomeFragment extends Fragment {
                             // Add to your list and update the adapter
                             workSpaceModelList.add(workspace);
                             workSpaceAdapter.notifyDataSetChanged();
+
                         }
                     }
                     // Handle case where no matching workspaces are found
-                    if (workSpaceModelList.isEmpty()) {
+                    if (workSpaceModelList.isEmpty() && getActivity() != null && isAdded()) {
                         Toast.makeText(requireContext(), "No workspace found", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -163,6 +166,5 @@ public class HomeFragment extends Fragment {
                 Log.d("errorCheck", "onCancelled: " + databaseError.getMessage());
             }
         });
-
     }
 }

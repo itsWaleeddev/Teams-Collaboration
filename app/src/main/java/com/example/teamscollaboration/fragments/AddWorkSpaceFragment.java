@@ -43,6 +43,7 @@ public class AddWorkSpaceFragment extends Fragment {
     String priority = null;
     String created_at = null;
     List<MembersModel> selectedMembers = new ArrayList<>();
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,66 +61,69 @@ public class AddWorkSpaceFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        binding.chooseMembersButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(requireContext(), ChooseMembers.class);
-                startActivityForResult(intent, 0);
-            }
-        });
-        binding.deadlineDateInput.setInputType(InputType.TYPE_NULL);
-        binding.deadlineDateInput.setFocusable(false);
-        binding.deadlineDateInput.setFocusableInTouchMode(false);
-        binding.deadlineDateInput.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                showDatePickerDialog();
-            }
-        });
-        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(requireContext(), R.layout.spinner_item, getResources().getTextArray(R.array.priority_levels)) {
-            @Override
-            public View getDropDownView(int position, View convertView, ViewGroup parent) {
-                View view = super.getDropDownView(position, convertView, parent);
-                view.setBackgroundColor(Color.WHITE); // Set the background color of the dropdown
-                return view;
-            }
-        };
-        binding.prioritySpinner.setAdapter(adapter);
-        binding.submitWorkspaceButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                workSpaceName = binding.workspaceNameInput.getText().toString().trim();
-                workSpaceDescription = binding.workspaceDescriptionInput.getText().toString().trim();
-                deadLine = binding.deadlineDateInput.getText().toString().trim();
-                priority = binding.prioritySpinner.getSelectedItem().toString().trim();
-
-                if (workSpaceName.isEmpty()) {
-                    binding.workspaceNameInput.setError("Field is Empty");
-                    return;
+        if (isAdded() && getActivity() != null) {
+            binding.chooseMembersButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(requireContext(), ChooseMembers.class);
+                    startActivityForResult(intent, 0);
                 }
+            });
+            binding.deadlineDateInput.setInputType(InputType.TYPE_NULL);
+            binding.deadlineDateInput.setFocusable(false);
+            binding.deadlineDateInput.setFocusableInTouchMode(false);
+            binding.deadlineDateInput.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-                if (workSpaceDescription.isEmpty()) {
-                    binding.workspaceDescriptionInput.setError("Field is Empty");
-                    return;
+                    showDatePickerDialog();
                 }
-
-                if (deadLine.isEmpty()) {
-                    Toast.makeText(requireContext(), "Please Choose the Deadline", Toast.LENGTH_SHORT).show();
-                    return;
+            });
+            ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(requireContext(), R.layout.spinner_item, getResources().getTextArray(R.array.priority_levels)) {
+                @Override
+                public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                    View view = super.getDropDownView(position, convertView, parent);
+                    view.setBackgroundColor(Color.WHITE); // Set the background color of the dropdown
+                    return view;
                 }
+            };
+            binding.prioritySpinner.setAdapter(adapter);
+            binding.submitWorkspaceButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    workSpaceName = binding.workspaceNameInput.getText().toString().trim();
+                    workSpaceDescription = binding.workspaceDescriptionInput.getText().toString().trim();
+                    deadLine = binding.deadlineDateInput.getText().toString().trim();
+                    priority = binding.prioritySpinner.getSelectedItem().toString().trim();
 
-                if (selectedMembers.isEmpty()) {
-                    Toast.makeText(requireContext(), "Please Choose the members for WorkSpace", Toast.LENGTH_SHORT).show();
-                    return;
+                    if (workSpaceName.isEmpty()) {
+                        binding.workspaceNameInput.setError("Field is Empty");
+                        return;
+                    }
+
+                    if (workSpaceDescription.isEmpty()) {
+                        binding.workspaceDescriptionInput.setError("Field is Empty");
+                        return;
+                    }
+
+                    if (deadLine.isEmpty()) {
+                        Toast.makeText(requireContext(), "Please Choose the Deadline", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    if (selectedMembers.isEmpty()) {
+                        Toast.makeText(requireContext(), "Please Choose the members for WorkSpace", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // If all fields are filled, proceed to save the workspace
+                    saveWorkSpace();
+                    Toast.makeText(requireContext(), "WorkSpace Created Successfully", Toast.LENGTH_SHORT).show();
                 }
-
-                // If all fields are filled, proceed to save the workspace
-                saveWorkSpace();
-                Toast.makeText(requireContext(), "WorkSpace Created Successfully", Toast.LENGTH_SHORT).show();
-            }
-        });
+            });
+        }
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -131,13 +135,15 @@ public class AddWorkSpaceFragment extends Fragment {
             }
         }
     }
-    private void saveWorkSpace(){
+
+    private void saveWorkSpace() {
         DatabaseReference workSpaceRef = databaseReference.child("Workspaces");
         String newWorkSpaceKey = workSpaceRef.push().getKey();
-        WorkSpaceModel workSpaceModel = new WorkSpaceModel(newWorkSpaceKey,workSpaceName, workSpaceDescription,
-                deadLine, priority, System.currentTimeMillis(), auth.getCurrentUser().getUid(),selectedMembers, "No Leader Yet");
+        WorkSpaceModel workSpaceModel = new WorkSpaceModel(newWorkSpaceKey, workSpaceName, workSpaceDescription,
+                deadLine, priority, System.currentTimeMillis(), auth.getCurrentUser().getUid(), selectedMembers, "No Leader Yet");
         workSpaceRef.child(newWorkSpaceKey).setValue(workSpaceModel);
     }
+
     // DatePickerDialog method
     private void showDatePickerDialog() {
         DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(),
