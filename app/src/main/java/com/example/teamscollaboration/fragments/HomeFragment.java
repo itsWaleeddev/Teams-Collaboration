@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.teamscollaboration.Adapters.WorkSpaceAdapter;
 import com.example.teamscollaboration.MainActivity;
+import com.example.teamscollaboration.Models.MembersModel;
 import com.example.teamscollaboration.Models.UserModel;
 import com.example.teamscollaboration.Models.WorkSpaceModel;
 import com.example.teamscollaboration.R;
@@ -139,19 +140,18 @@ public class HomeFragment extends Fragment {
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot workspaceSnapshot : dataSnapshot.getChildren()) {
                         // Access the memberList child inside each workspace
-                        DataSnapshot memberListSnapshot = workspaceSnapshot.child("memberList");
+                        DataSnapshot memberListSnapshot = workspaceSnapshot.child("membersList");
+                        for(DataSnapshot member : memberListSnapshot.getChildren()){
+                            MembersModel membersModel = member.getValue(MembersModel.class);
+                            if (membersModel!=null && membersModel.getuID().equals(auth.getCurrentUser().getUid())) {
+                                // If it matches, get the workspace data
+                                WorkSpaceModel workspace = workspaceSnapshot.getValue(WorkSpaceModel.class);
 
-                        // Check if the adminId in memberList matches the current user's UID
-                        if (memberListSnapshot.child("uID").exists() &&
-                                memberListSnapshot.child("uID").getValue(String.class).equals(auth.getCurrentUser().getUid())) {
+                                // Add to your list and update the adapter
+                                workSpaceModelList.add(workspace);
+                                workSpaceAdapter.notifyDataSetChanged();
 
-                            // If it matches, get the workspace data
-                            WorkSpaceModel workspace = workspaceSnapshot.getValue(WorkSpaceModel.class);
-
-                            // Add to your list and update the adapter
-                            workSpaceModelList.add(workspace);
-                            workSpaceAdapter.notifyDataSetChanged();
-
+                            }
                         }
                     }
                     // Handle case where no matching workspaces are found

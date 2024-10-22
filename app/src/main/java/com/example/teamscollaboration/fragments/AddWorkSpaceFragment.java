@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -66,6 +68,9 @@ public class AddWorkSpaceFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(requireContext(), ChooseMembers.class);
+                    if(!selectedMembers.isEmpty()) {
+                        intent.putExtra("Members", (Serializable) selectedMembers);
+                    }
                     startActivityForResult(intent, 0);
                 }
             });

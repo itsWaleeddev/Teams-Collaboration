@@ -22,6 +22,18 @@ public class MembersModel implements Serializable {
     public MembersModel() {
     }
 
+    @Override
+    public String toString() {
+        return "MembersModel{" +
+                "uID='" + uID + '\'' +
+                ", email='" + email + '\'' +
+                ", name='" + name + '\'' +
+                ", isChecked=" + isChecked +
+                ", role='" + role + '\'' +
+                ", userImage='" + userImage + '\'' +
+                '}';
+    }
+
     public String getRole() {
         return role;
     }

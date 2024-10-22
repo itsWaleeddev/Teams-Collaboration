@@ -1,6 +1,7 @@
 package com.example.teamscollaboration.Adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -53,6 +54,7 @@ public class ChooseMembersAdapter extends RecyclerView.Adapter<ChooseMembersAdap
     public int getItemCount() {
         return membersList.size();
     }
+
     public List<MembersModel> getSelectedMembers() {
         List<MembersModel> selectedMembers = new ArrayList<>();
         for (MembersModel member : membersList) {

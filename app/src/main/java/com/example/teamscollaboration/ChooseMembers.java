@@ -37,6 +37,7 @@ public class ChooseMembers extends AppCompatActivity {
     List<MembersModel> membersModelList = new ArrayList<>();
     ChooseMembersAdapter adapter;
     List<MembersModel> selectedMembers = new ArrayList<>();
+    List<MembersModel> members = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +55,14 @@ public class ChooseMembers extends AppCompatActivity {
         binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
         auth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
-        setAdapter();
-        retrieveDataForAdapter();
+        members = (ArrayList<MembersModel>) getIntent().getSerializableExtra("Members");
+        if (members != null && !members.isEmpty()) {
+            setUpdatedAdapter();
+            retrieveDataForAdapter();
+        } else {
+            setAdapter();
+            retrieveDataForAdapter();
+        }
         binding.confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -68,13 +75,15 @@ public class ChooseMembers extends AppCompatActivity {
             }
         });
     }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId()==android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             finish();
         }
         return super.onOptionsItemSelected(item);
     }
+
     private void retrieveDataForAdapter() {
         databaseReference.child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -89,8 +98,24 @@ public class ChooseMembers extends AppCompatActivity {
                         String email = oneSnapShot.child("email").getValue(String.class);
                         String imageUrl = oneSnapShot.child("userImage").getValue(String.class);
                         if (!role.equals("Admin")) {
-                            membersModelList.add(new MembersModel(email, uID, name, false, role, imageUrl));
+                            MembersModel membersModel = new MembersModel(email, uID, name, false, role, imageUrl);
+                            membersModelList.add(membersModel);
                             adapter.notifyDataSetChanged();
+                        }
+                    }
+                }
+                if (members!=null && !members.isEmpty() &&membersModelList != null && !membersModelList.isEmpty()) {
+                    // Iterate over membersModelList
+                    for (MembersModel membersModelFromList : membersModelList) {
+                        boolean exists = false;
+                        for (MembersModel member : members) {
+                            if (member.getuID().equals(membersModelFromList.getuID())) {
+                                exists = true;
+                                break;
+                            }
+                        }
+                        if (!exists) {
+                            members.add(membersModelFromList);
                         }
                     }
                 }
@@ -106,6 +131,12 @@ public class ChooseMembers extends AppCompatActivity {
     private void setAdapter() {
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ChooseMembersAdapter(this, membersModelList);
+        binding.recyclerView.setAdapter(adapter);
+    }
+
+    private void setUpdatedAdapter() {
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new ChooseMembersAdapter(this, members);
         binding.recyclerView.setAdapter(adapter);
     }
 }
