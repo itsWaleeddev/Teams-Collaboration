@@ -15,10 +15,12 @@ public class TasksModel implements Serializable {
     String TeamLeader = null;
     String workSpaceKey = null;
     String taskStatus = null;
+    String fileUri = null;
+    String fileName = null;
 
     public TasksModel(String taskKey, String taskName, String taskDescription, String deadLine, String endTime,
                       Long created_at, String adminId, List<MembersModel> membersList, String teamLeader, String workSpaceKey,
-                      String taskStatus) {
+                      String taskStatus, String fileUri, String fileName) {
         this.taskKey = taskKey;
         this.taskName = taskName;
         this.taskDescription = taskDescription;
@@ -30,9 +32,19 @@ public class TasksModel implements Serializable {
         TeamLeader = teamLeader;
         this.workSpaceKey = workSpaceKey;
         this.taskStatus = taskStatus;
+        this.fileUri = fileUri;
+        this.fileName = fileName;
     }
 
     public TasksModel() {
+    }
+
+    public String getFileUri() {
+        return fileUri;
+    }
+
+    public void setFileUri(String fileUri) {
+        this.fileUri = fileUri;
     }
 
     public String getEndTime() {

@@ -4,15 +4,24 @@ import static androidx.core.content.ContentProviderCompat.requireContext;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.pdf.PdfRenderer;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
+import android.provider.DocumentsContract;
 import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
@@ -33,7 +42,10 @@ import com.example.teamscollaboration.databinding.ActivityAddTaskBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.InputStream;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -52,6 +64,9 @@ public class AddTaskActivity extends AppCompatActivity {
     String taskDeadline = null;
     String taskEndTime = null;
     String workSpaceKey = null;
+    private static final int PICK_FILE_REQUEST_CODE = 1;
+    private Uri selectedFileUri;
+    String fileName = null;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -63,6 +78,24 @@ public class AddTaskActivity extends AppCompatActivity {
             }
             if(!selectedMembers.isEmpty()){
                 binding.chooseMembersButton.setText("Assigned Members");
+            }
+        }
+        if (requestCode == PICK_FILE_REQUEST_CODE && resultCode == RESULT_OK) {
+            if (data != null) {
+                // Retrieve the selected file's URI
+                selectedFileUri = data.getData();
+                if (selectedFileUri != null) {
+                    fileName = getFileName(selectedFileUri);
+                    binding.fileName.setText(fileName);
+                    Toast.makeText(this, "File selected: " + fileName, Toast.LENGTH_SHORT).show();
+
+                    // Check if the file is a PDF
+                    if (isPdfFile(selectedFileUri)) {
+                        displayPdfFirstPage(selectedFileUri);
+                    } else if (isImageFile(selectedFileUri)) {
+                        displayImage(selectedFileUri);
+                    }
+                }
             }
         }
 
@@ -85,6 +118,12 @@ public class AddTaskActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+        binding.chooseFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openFileChooser();
+            }
+        });
         binding.submitTaskButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -217,9 +256,104 @@ public class AddTaskActivity extends AppCompatActivity {
     private void saveTask(){
         DatabaseReference tasksRef = databaseReference.child("Tasks").child(workSpaceKey);
         String newTaskKey = tasksRef.push().getKey();
+        // Upload the file to Firebase Storage
         TasksModel tasksModel = new TasksModel(newTaskKey, taskName,taskDescription, taskDeadline,
                  taskEndTime, System.currentTimeMillis(), auth.getCurrentUser().getUid(),
-                selectedMembers, null, workSpaceKey, "pending");
+                selectedMembers, null, workSpaceKey, "pending", null, null);
        tasksRef.child(newTaskKey).setValue(tasksModel);
+       uploadFileToFirebase(newTaskKey);
+    }
+    private void openFileChooser() {
+        // Intent to open file picker
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*"); // Allow all file types; you can specify "application/pdf" or "image/*" for specific types
+
+        // If targeting API 19+, use DocumentsContract to let users pick from external storage providers like Google Drive
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Uri.parse("content://com.android.externalstorage.documents/document/primary:"));
+        }
+
+        startActivityForResult(intent, PICK_FILE_REQUEST_CODE);
+    }
+    // Method to get the file name from URI
+    private String getFileName(Uri uri) {
+        String result = uri.getLastPathSegment();
+        int cut = result.lastIndexOf('/');
+        if (cut != -1) {
+            result = result.substring(cut + 1);
+        }
+        return result;
+    }
+    private boolean isImageFile(Uri uri) {
+        ContentResolver contentResolver = getContentResolver();
+        String type = contentResolver.getType(uri);
+        return type != null && type.startsWith("image/");
+    }
+
+    private boolean isPdfFile(Uri uri) {
+        ContentResolver contentResolver = getContentResolver();
+        String type = contentResolver.getType(uri);
+        return type != null && type.equals("application/pdf");
+    }
+
+    private void displayImage(Uri uri) {
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            binding.chooseFile.setImageBitmap(bitmap);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error displaying image", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void displayPdfFirstPage(Uri uri) {
+        try {
+            ParcelFileDescriptor fileDescriptor = getContentResolver().openFileDescriptor(uri, "r");
+            if (fileDescriptor != null) {
+                PdfRenderer pdfRenderer = new PdfRenderer(fileDescriptor);
+                PdfRenderer.Page page = pdfRenderer.openPage(0);
+
+                Bitmap bitmap = Bitmap.createBitmap(page.getWidth(), page.getHeight(), Bitmap.Config.ARGB_8888);
+                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+
+                binding.chooseFile.setImageBitmap(bitmap);
+
+                page.close();
+                pdfRenderer.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error displaying PDF first page", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void uploadFileToFirebase(String newTaskKey) {
+        if (selectedFileUri != null) {
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference("Tasks/");
+            StorageReference fileRef = storageRef.child( newTaskKey + "." + getFileExtension(selectedFileUri));
+
+            fileRef.putFile(selectedFileUri)
+                    .addOnSuccessListener(taskSnapshot -> fileRef.getDownloadUrl().addOnSuccessListener(downloadUri -> {
+                        String downloadUrl = downloadUri.toString();
+                        saveFileMetadataToDatabase(downloadUrl, newTaskKey);
+                    }))
+                    .addOnFailureListener(e -> Log.d("fileUpload", "uploadFileToFirebase: " + e.getMessage()));
+        }
+    }
+
+    private String getFileExtension(Uri uri) {
+        ContentResolver contentResolver = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(contentResolver.getType(uri));
+    }
+    private void saveFileMetadataToDatabase(String downloadUrl, String newTaskKey) {
+        DatabaseReference tasksRef = databaseReference.child("Tasks").child(workSpaceKey);
+        tasksRef.child(newTaskKey).child("fileUri").setValue(downloadUrl);
+        if(fileName!=null) {
+            databaseReference.child("Tasks").child(workSpaceKey);
+            tasksRef.child(newTaskKey).child("fileName").setValue(fileName);
+        }
     }
 }
