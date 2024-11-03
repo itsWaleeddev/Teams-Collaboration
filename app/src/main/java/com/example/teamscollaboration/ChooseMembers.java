@@ -99,7 +99,7 @@ public class ChooseMembers extends AppCompatActivity {
                         String imageUrl = oneSnapShot.child("userImage").getValue(String.class);
                         String about = oneSnapShot.child("about").getValue(String.class);
                         if (!role.equals("Admin")) {
-                            MembersModel membersModel = new MembersModel(email, uID, name, false, role, imageUrl, about);
+                            MembersModel membersModel = new MembersModel(email, uID, name, false, role, imageUrl, about, false);
                             membersModelList.add(membersModel);
                             adapter.notifyDataSetChanged();
                         }

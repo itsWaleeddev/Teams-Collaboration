@@ -3,6 +3,7 @@ package com.example.teamscollaboration;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -14,6 +15,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.teamscollaboration.Adapters.ChooseMembersAdapter;
 import com.example.teamscollaboration.Models.MembersModel;
 import com.example.teamscollaboration.Adapters.TasksMembersAdapter;
 import com.example.teamscollaboration.Models.WorkSpaceModel;
@@ -29,6 +31,7 @@ public class TasksMembers extends AppCompatActivity {
     List<MembersModel> membersModelList = new ArrayList<>();
     TasksMembersAdapter adapter;
     List<MembersModel> selectedMembers = new ArrayList<>();
+    List<MembersModel> members = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +48,34 @@ public class TasksMembers extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
         workSpaceModel = (WorkSpaceModel) getIntent().getSerializableExtra("workSpace");
+        members = (ArrayList<MembersModel>) getIntent().getSerializableExtra("Members");
+        if(members!=null){
+        for(MembersModel membersModel : members){
+            Log.d("membersCheck1", "onCreate: " + membersModel);
+        }}
         if(workSpaceModel!=null){
             membersModelList = workSpaceModel.getMembersList();
+            if (members != null && !members.isEmpty() && membersModelList != null && !membersModelList.isEmpty()) {
+                // Iterate over membersModelList
+                for (MembersModel membersModelFromList : membersModelList) {
+                    boolean exists = false;
+                    for (MembersModel member : members) {
+                        if (member.getuID().equals(membersModelFromList.getuID())) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if (!exists) {
+                        members.add(membersModelFromList);
+                    }
+                }
+                setUpdatedAdapter();
+            }
+            else{
+                setAdapter();
+            }
         }
-        setAdapter();
+
         binding.confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -60,16 +87,26 @@ public class TasksMembers extends AppCompatActivity {
             }
         });
     }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId()==android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             finish();
         }
         return super.onOptionsItemSelected(item);
     }
-    private void setAdapter(){
+
+    private void setAdapter() {
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new TasksMembersAdapter(this, membersModelList);
         binding.recyclerView.setAdapter(adapter);
+        Log.d("membersCheck", "setAdapter: ");
+    }
+
+    private void setUpdatedAdapter() {
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new TasksMembersAdapter(this, members);
+        binding.recyclerView.setAdapter(adapter);
+        Log.d("membersCheck", "setUpdatedAdapter: " );
     }
 }

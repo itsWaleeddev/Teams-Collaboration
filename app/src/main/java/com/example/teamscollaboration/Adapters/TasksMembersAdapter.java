@@ -39,17 +39,18 @@ public class TasksMembersAdapter extends RecyclerView.Adapter<TasksMembersAdapte
         MembersModel member = membersList.get(position);
         holder.binding.memberName.setText(member.getName());
         Glide.with(context).load(member.getUserImage()).into(holder.binding.memberImage);
+        holder.binding.checkBox.setChecked(member.getTaskCheck());
         holder.binding.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                member.setChecked(b);
+                member.setTaskCheck(b);
             }
         });
     }
     public List<MembersModel> getSelectedMembers() {
         List<MembersModel> selectedMembers = new ArrayList<>();
         for (MembersModel member : membersList) {
-            if (member.getChecked()) {
+            if (member.getTaskCheck()) {
                 selectedMembers.add(member);
             }
         }

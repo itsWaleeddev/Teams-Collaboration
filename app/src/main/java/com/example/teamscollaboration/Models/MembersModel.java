@@ -10,8 +10,9 @@ public class MembersModel implements Serializable {
     String role = null;
     String userImage = null;
     String about = null;
+    Boolean taskCheck = false;
 
-    public MembersModel(String email, String uID, String name, Boolean isChecked, String role, String userImage, String about) {
+    public MembersModel(String email, String uID, String name, Boolean isChecked, String role, String userImage, String about, Boolean taskCheck) {
         this.email = email;
         this.uID = uID;
         this.name = name;
@@ -19,6 +20,7 @@ public class MembersModel implements Serializable {
         this.role = role;
         this.userImage = userImage;
         this.about = about;
+        this.taskCheck = taskCheck;
     }
 
     public MembersModel() {
@@ -34,7 +36,16 @@ public class MembersModel implements Serializable {
                 ", role='" + role + '\'' +
                 ", userImage='" + userImage + '\'' +
                 ", about='" + about + '\'' +
+                ", taskCheck=" + taskCheck +
                 '}';
+    }
+
+    public Boolean getTaskCheck() {
+        return taskCheck;
+    }
+
+    public void setTaskCheck(Boolean taskCheck) {
+        this.taskCheck = taskCheck;
     }
 
     public String getAbout() {

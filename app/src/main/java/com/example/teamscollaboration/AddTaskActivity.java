@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,7 +61,11 @@ public class AddTaskActivity extends AppCompatActivity {
             if (selectedMembers != null) {
                 this.selectedMembers = selectedMembers;
             }
+            if(!selectedMembers.isEmpty()){
+                binding.chooseMembersButton.setText("Assigned Members");
+            }
         }
+
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +128,9 @@ public class AddTaskActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(AddTaskActivity.this, TasksMembers.class);
                 intent.putExtra("workSpace", (Serializable) workSpaceModel);
+                if(!selectedMembers.isEmpty()) {
+                    intent.putExtra("Members", (Serializable) selectedMembers);
+                }
                 startActivityForResult(intent, 0);
             }
         });

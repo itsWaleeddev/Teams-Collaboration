@@ -89,7 +89,7 @@
         android:layout_marginTop="15dp"
         android:background="@drawable/button_design"
         android:padding="15dp"
-        android:text="Assigned to"
+        android:text="Assign to"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
