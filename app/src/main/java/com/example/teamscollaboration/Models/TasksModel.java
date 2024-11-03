@@ -8,7 +8,7 @@ public class TasksModel implements Serializable {
     String taskName = null;
     String taskDescription = null;
     String deadLine = null;
-    String priority = null;
+    String endTime = null;
     Long created_at = null;
     String teamLeadId = null;
     List<MembersModel> membersList;
@@ -16,14 +16,14 @@ public class TasksModel implements Serializable {
     String workSpaceKey = null;
     String taskStatus = null;
 
-    public TasksModel(String taskKey, String taskName, String taskDescription, String deadLine, String priority,
+    public TasksModel(String taskKey, String taskName, String taskDescription, String deadLine, String endTime,
                       Long created_at, String adminId, List<MembersModel> membersList, String teamLeader, String workSpaceKey,
                       String taskStatus) {
         this.taskKey = taskKey;
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.deadLine = deadLine;
-        this.priority = priority;
+        this.endTime = endTime;
         this.created_at = created_at;
         this.teamLeadId = adminId;
         this.membersList = membersList;
@@ -33,6 +33,14 @@ public class TasksModel implements Serializable {
     }
 
     public TasksModel() {
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 
     public String getTaskStatus() {
@@ -105,14 +113,6 @@ public class TasksModel implements Serializable {
 
     public void setDeadLine(String deadLine) {
         this.deadLine = deadLine;
-    }
-
-    public String getPriority() {
-        return priority;
-    }
-
-    public void setPriority(String priority) {
-        this.priority = priority;
     }
 
     public Long getCreated_at() {

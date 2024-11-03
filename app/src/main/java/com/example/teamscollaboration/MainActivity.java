@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -26,6 +27,7 @@ import com.example.teamscollaboration.fragments.ChatsFragment;
 import com.example.teamscollaboration.fragments.DashboardFragment;
 import com.example.teamscollaboration.fragments.HomeFragment;
 import com.example.teamscollaboration.fragments.ProfileFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -42,6 +44,7 @@ import nl.joery.animatedbottombar.AnimatedBottomBar;
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
     private boolean isDataFetched = false;
+    private boolean isBottomBarEnabled = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +67,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(int i, @Nullable AnimatedBottomBar.Tab tab, int i1, @NonNull AnimatedBottomBar.Tab tab1) {
                 Fragment selectedFragment = null;
+                if (!isBottomBarEnabled) {
+                    // Prevent tab switching by re-selecting the previous tab
+                    binding.bottomBar.selectTabAt(4, true);
+                    Toast toast = Toast.makeText(MainActivity.this, "Action blocked during loading", Toast.LENGTH_SHORT);
+                    toast.show();
+                    new android.os.Handler().postDelayed(toast::cancel, 300);
+                    return;
+                }
                 // Switch between fragments based on the selected tab's index
                 switch (i1) {
                     case 0:
@@ -96,5 +107,8 @@ public class MainActivity extends AppCompatActivity {
                 //reselection logic if needed
             }
         });
+    }
+    public void setBottomBarEnabled(boolean enabled) {
+        isBottomBarEnabled = enabled;
     }
 }

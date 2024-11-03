@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
         android:allowBackup="true"
@@ -14,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TeamsCollaboration"
         tools:targetApi="34">
+        <activity
+            android:name=".MemberDetailsActivity"
+            android:exported="false" />
         <activity
             android:name=".TaskDetailsActivity"
             android:exported="false" />
@@ -30,14 +35,10 @@
         <activity
             android:name=".AllMembersActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ChooseMembers"
             android:exported="false" />
-        <activity
-            android:name=".AddWorkSpace"
-            android:exported="false"
-            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".SignInActivity"
             android:exported="true">

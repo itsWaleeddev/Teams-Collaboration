@@ -139,6 +139,9 @@ public class AddWorkSpaceFragment extends Fragment {
                 this.selectedMembers = selectedMembers;
             }
         }
+        if(!selectedMembers.isEmpty()){
+            binding.chooseMembersButton.setText("Update Members");
+        }
     }
 
     private void saveWorkSpace() {

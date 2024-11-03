@@ -1,6 +1,7 @@
 package com.example.teamscollaboration.Adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.teamscollaboration.MemberDetailsActivity;
 import com.example.teamscollaboration.Models.MembersModel;
 import com.example.teamscollaboration.Models.WorkSpaceModel;
 import com.example.teamscollaboration.R;
@@ -55,6 +57,16 @@ public class AllMembersAdapter extends RecyclerView.Adapter<AllMembersAdapter.Vi
         MembersModel member = selectedMembersList.get(position);
         holder.binding.memberName.setText(member.getName());
         Glide.with(context).load(member.getUserImage()).into(holder.binding.memberImage);
+        holder.binding.getRoot().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, MemberDetailsActivity.class);
+                intent.putExtra("name",member.getName());
+                intent.putExtra("about",member.getAbout());
+                intent.putExtra("image",member.getUserImage());
+                context.startActivity(intent);
+            }
+        });
         holder.binding.getRoot().setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {

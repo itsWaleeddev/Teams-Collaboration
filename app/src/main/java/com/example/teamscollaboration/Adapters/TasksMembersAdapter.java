@@ -8,6 +8,7 @@ import android.widget.CompoundButton;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.teamscollaboration.Models.MembersModel;
 import com.example.teamscollaboration.databinding.ItemMemberBinding;
 
@@ -37,6 +38,7 @@ public class TasksMembersAdapter extends RecyclerView.Adapter<TasksMembersAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         MembersModel member = membersList.get(position);
         holder.binding.memberName.setText(member.getName());
+        Glide.with(context).load(member.getUserImage()).into(holder.binding.memberImage);
         holder.binding.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {

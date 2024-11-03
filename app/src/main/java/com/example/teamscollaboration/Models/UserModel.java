@@ -6,16 +6,26 @@ public class UserModel {
     String role = null;
     String email = null;
     String userImage = null;
+    String about = null;
 
-    public UserModel(String userId, String name, String role, String email, String userImage) {
+    public UserModel(String userId, String name, String role, String email, String userImage, String about) {
         this.userId = userId;
         this.name = name;
         this.role = role;
         this.email = email;
         this.userImage = userImage;
+        this.about = about;
     }
 
     public UserModel() {
+    }
+
+    public String getAbout() {
+        return about;
+    }
+
+    public void setAbout(String about) {
+        this.about = about;
     }
 
     public String getUserImage() {

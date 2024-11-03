@@ -192,7 +192,7 @@ public class SignInActivity extends AppCompatActivity {
                         imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
-                                UserModel usermodel = new UserModel(uId, name, role, email, userImage.toString());
+                                UserModel usermodel = new UserModel(uId, name, role, email, userImage.toString(), "");
                                 if (auth.getCurrentUser() != null) {
                                     databaseReference.child("Users").child(uId).setValue(usermodel).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override

@@ -58,18 +58,18 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (isAdded() && getActivity() != null) {
-            binding.userName.setText(auth.getCurrentUser().getDisplayName());
-            Glide.with(this).load(auth.getCurrentUser().getPhotoUrl()).into(binding.userProfile);
-            retrieveRole();
+            retrieveUserData();
         }
     }
 
-    private void retrieveRole() {
+    private void retrieveUserData() {
         databaseReference.child("Users").child(auth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     UserModel userModel = snapshot.getValue(UserModel.class);
+                    binding.userName.setText(userModel.getName());
+                    Glide.with(requireContext()).load(userModel.getUserImage()).into(binding.userProfile);
                     binding.Role.setText(userModel.getRole());
                     role = userModel.getRole();
                     if (role != null) {

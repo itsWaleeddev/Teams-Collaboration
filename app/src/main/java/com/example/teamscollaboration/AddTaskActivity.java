@@ -1,6 +1,9 @@
 package com.example.teamscollaboration;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -11,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -34,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class AddTaskActivity extends AppCompatActivity {
     ActivityAddTaskBinding binding;
@@ -44,7 +49,7 @@ public class AddTaskActivity extends AppCompatActivity {
     String taskName = null;
     String taskDescription = null;
     String taskDeadline = null;
-    String priority = null;
+    String taskEndTime = null;
     String workSpaceKey = null;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -81,7 +86,7 @@ public class AddTaskActivity extends AppCompatActivity {
                 taskName = binding.taskNameInput.getText().toString().trim();
                 taskDescription = binding.taskDescriptionInput.getText().toString().trim();
                 taskDeadline = binding.deadlineDateInput.getText().toString().trim();
-                priority = binding.prioritySpinner.getSelectedItem().toString().trim();
+                taskEndTime = binding.deadlineTimeInput.getText().toString().trim();
 
                 if (taskName.isEmpty()) {
                     binding.taskNameInput.setError("Field is Empty");
@@ -95,6 +100,11 @@ public class AddTaskActivity extends AppCompatActivity {
 
                 if (taskDeadline.isEmpty()) {
                     Toast.makeText(AddTaskActivity.this, "Please Choose the Deadline", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (taskEndTime.isEmpty()) {
+                    Toast.makeText(AddTaskActivity.this, "Please Choose the End Time", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -125,17 +135,15 @@ public class AddTaskActivity extends AppCompatActivity {
                 showDatePickerDialog();
             }
         });
-        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, R.layout.spinner_item,
-                getResources().getTextArray(R.array.priority_levels)) {
+        binding.deadlineTimeInput.setInputType(InputType.TYPE_NULL);
+        binding.deadlineTimeInput.setFocusable(false);
+        binding.deadlineTimeInput.setFocusableInTouchMode(false);
+        binding.deadlineTimeInput.setOnClickListener(new View.OnClickListener() {
             @Override
-            public View getDropDownView(int position, View convertView, ViewGroup parent) {
-                View view = super.getDropDownView(position, convertView, parent);
-                view.setBackgroundColor(Color.WHITE); // Set the background color of the dropdown
-                return view;
+            public void onClick(View view) {
+                showTimePickerDialog();
             }
-        };
-
-        binding.prioritySpinner.setAdapter(adapter);
+        });
     }
 
     @Override
@@ -169,11 +177,40 @@ public class AddTaskActivity extends AppCompatActivity {
 
         datePickerDialog.show();
     }
+    // TimePickerDialog method
+    private void showTimePickerDialog() {
+        // Get current time as default
+        Calendar calendar = Calendar.getInstance();
+        int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+        int currentMinute = calendar.get(Calendar.MINUTE);
+
+        // Create TimePickerDialog
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this,
+                new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        Calendar selectedTime = Calendar.getInstance();
+                        selectedTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        selectedTime.set(Calendar.MINUTE, minute);
+
+                        // Format selected time with AM/PM
+                        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+                        String formattedTime = timeFormat.format(selectedTime.getTime());
+
+                        // Set formatted time to EditText
+                        binding.deadlineTimeInput.setText(formattedTime);
+                    }
+                },
+                currentHour, currentMinute, false); // 'false' for 12-hour format with AM/PM
+
+        timePickerDialog.show();
+    }
+
     private void saveTask(){
         DatabaseReference tasksRef = databaseReference.child("Tasks").child(workSpaceKey);
         String newTaskKey = tasksRef.push().getKey();
         TasksModel tasksModel = new TasksModel(newTaskKey, taskName,taskDescription, taskDeadline,
-                 priority, System.currentTimeMillis(), auth.getCurrentUser().getUid(),
+                 taskEndTime, System.currentTimeMillis(), auth.getCurrentUser().getUid(),
                 selectedMembers, null, workSpaceKey, "pending");
        tasksRef.child(newTaskKey).setValue(tasksModel);
     }
