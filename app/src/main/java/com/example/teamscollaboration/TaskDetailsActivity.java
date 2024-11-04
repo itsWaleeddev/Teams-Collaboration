@@ -123,9 +123,8 @@ public class TaskDetailsActivity extends AppCompatActivity {
         checkIfRemoteFileIsPdf(uri.toString(), isPdf -> {
             if (isPdf) {
                 downloadAndDisplayPdf(uri.toString());
-            } else if (isImageFile(uri)) {
-                Bitmap bitmap = displayImage(uri);
-                binding.taskFile.setImageBitmap(bitmap);
+            } else {
+               Glide.with(this).load(uri).into(binding.taskFile);
             }
         });
         binding.taskFileName.setText(tasksModel.getFileName());
@@ -249,6 +248,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
     }
 
     private void saveFileMetadataToDatabase(String downloadUrl) {
+        updateTaskStatusForMember();
         TaskUploadModel taskUploadModel = new TaskUploadModel(userName, auth.getCurrentUser().getUid(),
                 downloadUrl, fileName, System.currentTimeMillis());
         DatabaseReference taskUploadsRef = databaseReference.child("Tasks").child(workSpaceKey).child(newTaskKey).child("taskUploads");
@@ -376,6 +376,40 @@ public class TaskDetailsActivity extends AppCompatActivity {
             }
         }).start();
     }
+    private void updateTaskStatusForMember() {
+        DatabaseReference memberStatusRef = databaseReference.child("Tasks")
+                .child(workSpaceKey)
+                .child(newTaskKey)
+                .child("membersList");
+
+        memberStatusRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot memberSnapshot : snapshot.getChildren()) {
+                    // Assuming the member ID field in your MembersModel is called "id"
+                    MembersModel member = memberSnapshot.getValue(MembersModel.class);
+                    if (member != null && member.getuID().equals(auth.getCurrentUser().getUid())) {
+                        // Match found, update the taskStatus
+                        memberSnapshot.getRef().child("taskStatus").setValue("Submitted")
+                                .addOnCompleteListener(task -> {
+                                    if (task.isSuccessful()) {
+                                        Log.d("TaskStatusUpdate", "Task status updated successfully.");
+                                    } else {
+                                        Log.e("TaskStatusUpdate", "Failed to update task status: " + task.getException().getMessage());
+                                    }
+                                });
+                        break; // Exit the loop since we found the matching member
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("DatabaseError", "onCancelled: " + error.getDetails());
+            }
+        });
+    }
+
     public interface PdfCheckCallback {
         void onResult(boolean isPdf);
     }

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="8dp">
+
+    <!-- Submitter's Name -->
+    <TextView
+        android:id="@+id/submitterName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Submitter Name"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/viewSubmissionButton"
+        app:layout_constraintHorizontal_bias="0.0" />
+
+    <!-- Submission Date -->
+    <TextView
+        android:id="@+id/submissionDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Submitted on: YYYY-MM-DD"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/submitterName"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- View Submission Button -->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/viewSubmissionButton"
+        android:layout_width="90dp"
+        android:layout_height="48dp"
+        android:background="@drawable/button_design"
+        android:text="View"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

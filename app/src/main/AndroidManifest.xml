@@ -17,6 +17,12 @@
         android:theme="@style/Theme.TeamsCollaboration"
         tools:targetApi="34">
         <activity
+            android:name=".SubmissionDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminTaskDetails"
+            android:exported="false" />
+        <activity
             android:name=".MemberDetailsActivity"
             android:exported="false" />
         <activity

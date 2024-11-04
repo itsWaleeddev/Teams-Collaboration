@@ -11,8 +11,10 @@ public class MembersModel implements Serializable {
     String userImage = null;
     String about = null;
     Boolean taskCheck = false;
+    String taskStatus = null;
 
-    public MembersModel(String email, String uID, String name, Boolean isChecked, String role, String userImage, String about, Boolean taskCheck) {
+    public MembersModel(String email, String uID, String name, Boolean isChecked,
+                        String role, String userImage, String about, Boolean taskCheck, String taskStatus) {
         this.email = email;
         this.uID = uID;
         this.name = name;
@@ -21,23 +23,18 @@ public class MembersModel implements Serializable {
         this.userImage = userImage;
         this.about = about;
         this.taskCheck = taskCheck;
+        this.taskStatus = taskStatus;
     }
 
     public MembersModel() {
     }
 
-    @Override
-    public String toString() {
-        return "MembersModel{" +
-                "uID='" + uID + '\'' +
-                ", email='" + email + '\'' +
-                ", name='" + name + '\'' +
-                ", isChecked=" + isChecked +
-                ", role='" + role + '\'' +
-                ", userImage='" + userImage + '\'' +
-                ", about='" + about + '\'' +
-                ", taskCheck=" + taskCheck +
-                '}';
+    public String getTaskStatus() {
+        return taskStatus;
+    }
+
+    public void setTaskStatus(String taskStatus) {
+        this.taskStatus = taskStatus;
     }
 
     public Boolean getTaskCheck() {

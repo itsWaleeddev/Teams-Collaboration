@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.teamscollaboration.Adapters.WorkSpaceAdapter;
 import com.example.teamscollaboration.Adapters.WorkSpaceDetailsAdapter;
+import com.example.teamscollaboration.Models.MembersModel;
 import com.example.teamscollaboration.Models.TasksModel;
 import com.example.teamscollaboration.Models.UserModel;
 import com.example.teamscollaboration.Models.WorkSpaceModel;
@@ -82,7 +83,17 @@ public class WorkSpaceDetails extends AppCompatActivity {
                 if(snapshot.exists()){
                     for(DataSnapshot oneWorkSpace : snapshot.getChildren()){
                         TasksModel taskModel = oneWorkSpace.getValue(TasksModel.class);
-                        tasksModelList.add(taskModel);
+                        if(workSpaceModel.getAdminId().equals(auth.getCurrentUser().getUid())){
+                            tasksModelList.add(taskModel);
+                        }
+                        else{
+                            List<MembersModel> membersModels = taskModel.getMembersList();
+                            for(MembersModel membersModel : membersModels){
+                                if(auth.getCurrentUser().getUid().equals(membersModel.getuID())){
+                                    tasksModelList.add(taskModel);
+                                }
+                            }
+                        }
                     }
                     setAdapter();
                 }

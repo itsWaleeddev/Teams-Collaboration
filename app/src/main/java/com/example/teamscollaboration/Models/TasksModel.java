@@ -60,6 +60,13 @@ public class TasksModel implements Serializable {
         this.fileName = fileName;
     }
 
+    public String getOwnerID() {
+        return ownerID;
+    }
+
+    public void setOwnerID(String ownerID) {
+        this.ownerID = ownerID;
+    }
 
     public String getFileUri() {
         return fileUri;

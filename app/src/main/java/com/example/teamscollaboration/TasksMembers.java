@@ -49,14 +49,11 @@ public class TasksMembers extends AppCompatActivity {
         binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
         workSpaceModel = (WorkSpaceModel) getIntent().getSerializableExtra("workSpace");
         members = (ArrayList<MembersModel>) getIntent().getSerializableExtra("Members");
-        if(members!=null){
-        for(MembersModel membersModel : members){
-            Log.d("membersCheck1", "onCreate: " + membersModel);
-        }}
+
         if(workSpaceModel!=null){
             membersModelList = workSpaceModel.getMembersList();
             if (members != null && !members.isEmpty() && membersModelList != null && !membersModelList.isEmpty()) {
-                // Iterate over membersModelList
+                // Iterate over membersList
                 for (MembersModel membersModelFromList : membersModelList) {
                     boolean exists = false;
                     for (MembersModel member : members) {
