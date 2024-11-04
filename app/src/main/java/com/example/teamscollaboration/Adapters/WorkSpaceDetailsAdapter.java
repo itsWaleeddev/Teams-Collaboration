@@ -51,6 +51,7 @@ public class WorkSpaceDetailsAdapter extends RecyclerView.Adapter<WorkSpaceDetai
            @Override
            public void onClick(View view) {
                Intent intent = new Intent(context, TaskDetailsActivity.class);
+               intent.putExtra("task", (Serializable) tasksModel);
                context.startActivity(intent);
            }
        });

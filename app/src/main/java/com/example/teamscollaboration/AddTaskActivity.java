@@ -35,15 +35,22 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide;
 import com.example.teamscollaboration.Models.MembersModel;
+import com.example.teamscollaboration.Models.TaskUploadModel;
 import com.example.teamscollaboration.Models.TasksModel;
+import com.example.teamscollaboration.Models.UserModel;
 import com.example.teamscollaboration.Models.WorkSpaceModel;
 import com.example.teamscollaboration.databinding.ActivityAddTaskBinding;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -158,7 +165,7 @@ public class AddTaskActivity extends AppCompatActivity {
                 }
 
                 // If all fields are filled, proceed to save the workspace
-                saveTask();
+                retrieveUserData();
                 Toast.makeText(AddTaskActivity.this, "Task Created Successfully", Toast.LENGTH_SHORT).show();
             }
         });
@@ -253,13 +260,13 @@ public class AddTaskActivity extends AppCompatActivity {
         timePickerDialog.show();
     }
 
-    private void saveTask(){
+    private void saveTask(String userName){
         DatabaseReference tasksRef = databaseReference.child("Tasks").child(workSpaceKey);
         String newTaskKey = tasksRef.push().getKey();
         // Upload the file to Firebase Storage
         TasksModel tasksModel = new TasksModel(newTaskKey, taskName,taskDescription, taskDeadline,
-                 taskEndTime, System.currentTimeMillis(), auth.getCurrentUser().getUid(),
-                selectedMembers, null, workSpaceKey, "pending", null, null);
+                 taskEndTime, System.currentTimeMillis(), auth.getCurrentUser().getUid(), userName,
+                selectedMembers, null, workSpaceKey, "pending", null, null, new ArrayList<>());
        tasksRef.child(newTaskKey).setValue(tasksModel);
        uploadFileToFirebase(newTaskKey);
     }
@@ -333,7 +340,6 @@ public class AddTaskActivity extends AppCompatActivity {
         if (selectedFileUri != null) {
             StorageReference storageRef = FirebaseStorage.getInstance().getReference("Tasks/");
             StorageReference fileRef = storageRef.child( newTaskKey + "." + getFileExtension(selectedFileUri));
-
             fileRef.putFile(selectedFileUri)
                     .addOnSuccessListener(taskSnapshot -> fileRef.getDownloadUrl().addOnSuccessListener(downloadUri -> {
                         String downloadUrl = downloadUri.toString();
@@ -355,5 +361,22 @@ public class AddTaskActivity extends AppCompatActivity {
             databaseReference.child("Tasks").child(workSpaceKey);
             tasksRef.child(newTaskKey).child("fileName").setValue(fileName);
         }
+    }
+    private void retrieveUserData() {
+        databaseReference.child("Users").child(auth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    UserModel userModel = snapshot.getValue(UserModel.class);
+                    String userName = userModel.getName();
+                    saveTask(userName);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("databaseError", "onCancelled: " + error.getMessage());
+            }
+        });
     }
 }
