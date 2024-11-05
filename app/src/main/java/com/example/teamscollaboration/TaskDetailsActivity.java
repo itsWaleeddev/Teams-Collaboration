@@ -62,6 +62,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
     String newTaskKey = null;
     String userName = null;
     String workSpaceKey = null;
+    String taskStatus = null;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -104,6 +105,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
         tasksModel = (TasksModel) getIntent().getSerializableExtra("task");
         newTaskKey = tasksModel.getTaskKey();
         workSpaceKey = tasksModel.getWorkSpaceKey();
+        getTaskStatus();
         binding.toolbar.setTitle(tasksModel.getTaskName());
         binding.ownerName.setText(tasksModel.getTaskOwner());
         setSupportActionBar(binding.toolbar);
@@ -122,7 +124,18 @@ public class TaskDetailsActivity extends AppCompatActivity {
         Log.d("uriCheck", "onCreate: " + uri.toString());
         checkIfRemoteFileIsPdf(uri.toString(), isPdf -> {
             if (isPdf) {
-                downloadAndDisplayPdf(uri.toString());
+                downloadAndDisplayPdf(uri.toString(), new BitmapCallback() {
+                    @Override
+                    public void onBitmapReady(Bitmap bitmap) {
+                        binding.taskFile.setImageBitmap(bitmap); // Display the bitmap in an ImageView
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        Toast.makeText(TaskDetailsActivity.this, error, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             } else {
                Glide.with(this).load(uri).into(binding.taskFile);
             }
@@ -135,13 +148,17 @@ public class TaskDetailsActivity extends AppCompatActivity {
         binding.uploadFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openFileChooser();
+                if(taskStatus.equals("pending")) {
+                    openFileChooser();
+                }
             }
         });
         binding.submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                retrieveUser();
+                if(taskStatus.equals("pending")){
+                    retrieveUser();
+                }
             }
         });
 
@@ -336,7 +353,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
 
 
 
-    private void downloadAndDisplayPdf(String url) {
+    private void downloadAndDisplayPdf(String url, BitmapCallback callback) {
         new Thread(() -> {
             try {
                 // Step 1: Download the PDF file
@@ -364,12 +381,11 @@ public class TaskDetailsActivity extends AppCompatActivity {
                 // Step 3: Update the ImageView on the main thread
                 runOnUiThread(() -> {
                     if (bitmap != null) {
-                        binding.taskFile.setImageBitmap(bitmap);
+                        callback.onBitmapReady(bitmap);
                     } else {
-                        Toast.makeText(this, "Failed to render PDF page", Toast.LENGTH_SHORT).show();
+                        callback.onError("Failed to render PDF page");
                     }
                 });
-
             } catch (IOException e) {
                 e.printStackTrace();
                 runOnUiThread(() -> Toast.makeText(this, "Error downloading PDF", Toast.LENGTH_SHORT).show());
@@ -393,6 +409,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
                         memberSnapshot.getRef().child("taskStatus").setValue("Submitted")
                                 .addOnCompleteListener(task -> {
                                     if (task.isSuccessful()) {
+                                        binding.submitButton.setText("Submitted");
                                         Log.d("TaskStatusUpdate", "Task status updated successfully.");
                                     } else {
                                         Log.e("TaskStatusUpdate", "Failed to update task status: " + task.getException().getMessage());
@@ -413,4 +430,93 @@ public class TaskDetailsActivity extends AppCompatActivity {
     public interface PdfCheckCallback {
         void onResult(boolean isPdf);
     }
+    private void retrieveUploadFile(){
+        DatabaseReference fileUploadRef = databaseReference.child("Tasks")
+                .child(workSpaceKey)
+                .child(newTaskKey)
+                .child("taskUploads");
+
+       fileUploadRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String uploadedFileUri = null;
+                String uploadedFileName = null;
+                for (DataSnapshot memberSnapshot : snapshot.getChildren()) {
+                    TaskUploadModel taskUploadModel = memberSnapshot.getValue(TaskUploadModel.class);
+                    if (taskUploadModel != null && taskUploadModel.getuID().equals(auth.getCurrentUser().getUid())) {
+                        uploadedFileUri = taskUploadModel.getFileUri();
+                        uploadedFileName = taskUploadModel.getFileName();
+                        if(uploadedFileUri!=null && uploadedFileName!=null){
+                            binding.uploadedFileName.setText(uploadedFileName);
+                            String finalFileUri = uploadedFileUri;
+                            Log.d("uriCheck", "onDataChange: " + finalFileUri);
+                            checkIfRemoteFileIsPdf(finalFileUri, isPdf -> {
+                                if (isPdf) {
+                                    downloadAndDisplayPdf(finalFileUri, new BitmapCallback() {
+                                        @Override
+                                        public void onBitmapReady(Bitmap bitmap) {
+                                            binding.uploadedFile.setImageBitmap(bitmap); // Display the bitmap in an ImageView
+                                        }
+
+                                        @Override
+                                        public void onError(String error) {
+                                            Toast.makeText(TaskDetailsActivity.this, error, Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+
+                                } else {
+                                    Glide.with(TaskDetailsActivity.this).load(Uri.parse(finalFileUri)).into(binding.uploadedFile);
+                                }
+                            });
+                        }
+                        break; // Exit the loop since we found the matching userUpload
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("DatabaseError", "onCancelled: " + error.getDetails());
+            }
+        });
+    }
+    private void getTaskStatus(){
+        DatabaseReference memberStatusRef = databaseReference.child("Tasks")
+                .child(workSpaceKey)
+                .child(newTaskKey)
+                .child("membersList");
+
+        memberStatusRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot memberSnapshot : snapshot.getChildren()) {
+                    // Assuming the member ID field in your MembersModel is called "id"
+                    MembersModel member = memberSnapshot.getValue(MembersModel.class);
+                    if (member != null && member.getuID().equals(auth.getCurrentUser().getUid())) {
+                        taskStatus = member.getTaskStatus();
+                        if(taskStatus!=null && taskStatus.equals("Submitted")){
+                            retrieveUploadFile();
+                            binding.submitButton.setText("Submitted");
+                            binding.submitButton.setClickable(false);
+                            binding.uploadFile.setText("File Uploaded");
+                            binding.uploadFile.setCompoundDrawablesWithIntrinsicBounds(R.drawable.uplaod_done, 0, 0, 0);
+                            binding.uploadFile.setClickable(false);
+                            break;
+                        }
+                        break; // Exit the loop since we found the matching member
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("DatabaseError", "onCancelled: " + error.getDetails());
+            }
+        });
+    }
+    public interface BitmapCallback {
+        void onBitmapReady(Bitmap bitmap);
+        void onError(String error);
+    }
+
 }
