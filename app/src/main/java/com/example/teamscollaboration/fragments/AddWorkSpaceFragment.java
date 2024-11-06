@@ -20,14 +20,19 @@ import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.teamscollaboration.ChooseMembers;
 import com.example.teamscollaboration.Models.MembersModel;
+import com.example.teamscollaboration.Models.UserModel;
 import com.example.teamscollaboration.Models.WorkSpaceModel;
 import com.example.teamscollaboration.R;
 import com.example.teamscollaboration.databinding.FragmentAddWorkSpaceBinding;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -122,7 +127,7 @@ public class AddWorkSpaceFragment extends Fragment {
                     }
 
                     // If all fields are filled, proceed to save the workspace
-                    saveWorkSpace();
+                    retrieveUserData(); //first retreive userName then saveWorkSpace called init
                     Toast.makeText(requireContext(), "WorkSpace Created Successfully", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -144,11 +149,12 @@ public class AddWorkSpaceFragment extends Fragment {
         }
     }
 
-    private void saveWorkSpace() {
+    private void saveWorkSpace(String userName, String userImage) {
         DatabaseReference workSpaceRef = databaseReference.child("Workspaces");
         String newWorkSpaceKey = workSpaceRef.push().getKey();
         WorkSpaceModel workSpaceModel = new WorkSpaceModel(newWorkSpaceKey, workSpaceName, workSpaceDescription,
-                deadLine, priority, System.currentTimeMillis(), auth.getCurrentUser().getUid(), selectedMembers, "No Leader Yet");
+                deadLine, priority, System.currentTimeMillis(), auth.getCurrentUser().getUid(),
+                userName, selectedMembers, "No Leader Yet", userImage);
         workSpaceRef.child(newWorkSpaceKey).setValue(workSpaceModel);
     }
 
@@ -175,5 +181,25 @@ public class AddWorkSpaceFragment extends Fragment {
                 Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
 
         datePickerDialog.show();
+    }
+    private void retrieveUserData() {
+        databaseReference.child("Users").child(auth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    UserModel userModel = snapshot.getValue(UserModel.class);
+                    if(userModel!=null){
+                        String userName = userModel.getName();
+                        String userImage = userModel.getUserImage();
+                        saveWorkSpace(userName, userImage);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("databaseError", "onCancelled: " + error.getMessage());
+            }
+        });
     }
 }

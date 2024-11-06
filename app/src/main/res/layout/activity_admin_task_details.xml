@@ -67,10 +67,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Assigned Members:"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
-                app:layout_constraintTop_toBottomOf="@id/taskDeadline"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/taskDeadline" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/assignedMembersRecyclerView"
@@ -89,10 +89,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Submissions:"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
-                app:layout_constraintTop_toBottomOf="@id/assignedMembersRecyclerView"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/assignedMembersRecyclerView" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/submissionsRecyclerView"
@@ -122,10 +122,10 @@
                     android:id="@+id/editTaskButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/button_design"
+                    android:background="@drawable/button"
                     android:padding="15dp"
+                    android:text="Edit"
                     android:textAllCaps="false"
-                    android:text="Edit Task"
                     android:textColor="@color/white" />
 
                 <androidx.appcompat.widget.AppCompatButton
@@ -133,10 +133,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:background="@drawable/button_design"
+                    android:background="@drawable/button"
                     android:padding="15dp"
+                    android:text="Delete"
                     android:textAllCaps="false"
-                    android:text="Delete Task"
                     android:textColor="@android:color/holo_red_dark" />
             </LinearLayout>
 

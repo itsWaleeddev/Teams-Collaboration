@@ -57,7 +57,7 @@ public class AssignedMembersAdapter extends RecyclerView.Adapter<AssignedMembers
         Glide.with(context).load(member.getUserImage()).into(holder.binding.memberImage);
         holder.binding.submissionStatusIndicator.setText(member.getTaskStatus());
         if(member.getTaskStatus().equals("Submitted")){
-            holder.binding.submissionStatusIndicator.setTextColor(context.getResources().getColor(R.color.blue));
+            holder.binding.submissionStatusIndicator.setTextColor(context.getResources().getColor(R.color.bblue));
         }
         else{
             holder.binding.submissionStatusIndicator.setTextColor(context.getResources().getColor(R.color.red));

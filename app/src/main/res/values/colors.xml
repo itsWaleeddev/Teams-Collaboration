@@ -4,4 +4,13 @@
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#B32196F3</color>
     <color name="red">#FFCC0000</color>
+    <color name="green">#4CAF50</color>
+    <color name="lightgreen">#8BC34A</color>
+    <color name="greeny">#009688</color>
+    <color name="grey">#708090</color>
+    <color name="charcoal">#36454F</color>
+    <color name="lightgrey">#778899</color>
+    <color name="bblue">#0080FE</color>
+    <color name="sapphire">#0F52BA</color>
+    <color name="yale">#0E4C92</color>
 </resources>

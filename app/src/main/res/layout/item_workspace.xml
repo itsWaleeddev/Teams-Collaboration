@@ -18,49 +18,22 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@drawable/two_tone_three">
 
-            <!-- Workspace Icon -->
-
-            <TextView
-                android:id="@+id/viewWorkspaceButton"
-                android:layout_width="wrap_content"
-                android:layout_height="35dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="18dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/button_design"
-                android:padding="8dp"
-                android:text=" View WorkSpace"
-                android:textAlignment="center"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/leaderName" />
-
-            <ImageView
-                android:id="@+id/workspaceIcon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="4dp"
-                android:scaleType="centerInside"
-                android:src="@drawable/workspace"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <!-- Workspace Name -->
             <TextView
                 android:id="@+id/workspaceName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
                 android:text="Workspace Name"
+                android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@id/workspaceIcon"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Workspace Description -->
@@ -68,117 +41,57 @@
             <!-- Number of Members -->
             <TextView
                 android:id="@+id/workspaceDescription"
-                android:layout_width="338dp"
-                android:layout_height="48dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginEnd="2dp"
+                android:layout_width="340dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:importantForAccessibility="no"
                 android:inputType="textMultiLine"
-                android:padding="8dp"
                 android:text="Workspace Description"
-                android:textColor="@android:color/darker_gray"
+                android:textColor="@color/white"
                 android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@id/workspaceName"
-                app:layout_constraintTop_toBottomOf="@id/workspaceName" />
+                app:layout_constraintTop_toBottomOf="@id/workspaceName"
+                tools:ignore="TouchTargetSize" />
 
             <!-- Number of Tasks -->
 
             <!-- Action Button (e.g., View or Edit) -->
 
             <TextView
-                android:id="@+id/workspaceMembers"
+                android:id="@+id/AdminName"
                 android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_marginTop="4dp"
-                android:gravity="center"
-                android:text="Members: "
-                android:textAlignment="center"
-                android:textSize="14sp"
-                app:layout_constraintStart_toStartOf="@+id/workspaceDescription"
-                app:layout_constraintTop_toBottomOf="@+id/workspaceDescription" />
-
-            <TextView
-                android:id="@+id/deadline"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginEnd="2dp"
-                android:layout_marginBottom="2dp"
-                android:gravity="center"
-                android:padding="8dp"
-                android:text="12 October 2024"
-                android:textAlignment="center"
-                android:textSize="14sp"
-                app:layout_constraintBottom_toTopOf="@+id/workspaceDescription"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/leaderName"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="18dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
                 android:gravity="center"
                 android:text="Ahmad Ali"
                 android:textAlignment="center"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/workspaceDescription" />
-
-            <TextView
-                android:id="@+id/workSpaceLeader"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="2dp"
-                android:gravity="center"
-                android:text="Team Leader: "
-                android:textAlignment="center"
-                app:layout_constraintEnd_toStartOf="@+id/leaderName"
-                app:layout_constraintTop_toBottomOf="@+id/workspaceDescription" />
-
-            <TextView
-                android:id="@+id/totalMembers"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_marginStart="2dp"
-                android:layout_marginTop="4dp"
-                android:gravity="center"
-                android:text="15"
-                android:textAlignment="center"
-                app:layout_constraintStart_toEndOf="@+id/workspaceMembers"
-                app:layout_constraintTop_toBottomOf="@+id/workspaceDescription" />
-
-            <TextView
-                android:id="@+id/showMembersButton"
-                android:layout_width="wrap_content"
-                android:layout_height="35dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/button_design"
-                android:padding="10dp"
-                android:text="Show Members"
                 android:textColor="@color/white"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/workspaceMembers"
-                app:layout_constraintTop_toBottomOf="@+id/workspaceMembers" />
+                app:layout_constraintStart_toEndOf="@+id/workSpaceAdmin"
+                app:layout_constraintTop_toBottomOf="@+id/workspaceDescription" />
 
             <TextView
-                android:id="@+id/workspaceDeadline"
+                android:id="@+id/workSpaceAdmin"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="2dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:gravity="center"
-                android:text="Deadline: "
+                android:text="Admin: "
                 android:textAlignment="center"
-                android:textSize="14sp"
-                app:layout_constraintBottom_toTopOf="@+id/workspaceDescription"
-                app:layout_constraintEnd_toStartOf="@+id/deadline"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:textColor="@color/white"
+                app:layout_constraintStart_toStartOf="@+id/workspaceDescription"
+                app:layout_constraintTop_toBottomOf="@+id/workspaceDescription" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/AdminImage"
+                android:layout_width="89dp"
+                android:layout_height="88dp"
+                android:layout_marginBottom="10dp"
+                android:padding="5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/workspaceDescription"
+                app:layout_constraintTop_toBottomOf="@+id/workspaceDescription"
+                tools:srcCompat="@tools:sample/avatars" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

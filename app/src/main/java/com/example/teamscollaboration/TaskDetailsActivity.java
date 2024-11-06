@@ -63,7 +63,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
     String userName = null;
     String workSpaceKey = null;
     String taskStatus = null;
-
+    String userID = null;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -111,8 +111,6 @@ public class TaskDetailsActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-        binding.taskname.setText(tasksModel.getTaskName());
-
         // Convert the timestamp to a Date object
         Date date = new Date(tasksModel.getCreated_at());
         // Format the date to a readable 12-hour format with AM/PM
@@ -121,7 +119,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
 
         binding.createdDate.setText(formattedDate);
         Uri uri = Uri.parse(tasksModel.getFileUri());
-        Log.d("uriCheck", "onCreate: " + uri.toString());
+        Log.d("uriCheck", "taskFile Uri" + uri.toString());
         checkIfRemoteFileIsPdf(uri.toString(), isPdf -> {
             if (isPdf) {
                 downloadAndDisplayPdf(uri.toString(), new BitmapCallback() {
@@ -140,6 +138,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
                Glide.with(this).load(uri).into(binding.taskFile);
             }
         });
+
         binding.taskFileName.setText(tasksModel.getFileName());
         binding.taskDeadline.setText(tasksModel.getDeadLine());
         binding.taskEndTime.setText(tasksModel.getEndTime());
@@ -168,6 +167,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -246,8 +246,8 @@ public class TaskDetailsActivity extends AppCompatActivity {
 
     private void uploadFileToFirebase() {
         if (selectedFileUri != null) {
-            StorageReference storageRef = FirebaseStorage.getInstance().getReference("Uploaded_Tasks/");
-            StorageReference fileRef = storageRef.child(auth.getCurrentUser().getUid() + "." + getFileExtension(selectedFileUri));
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference("Uploaded_Tasks/" + userID +"/");
+            StorageReference fileRef = storageRef.child(tasksModel.getTaskKey() + "." + getFileExtension(selectedFileUri));
 
             fileRef.putFile(selectedFileUri)
                     .addOnSuccessListener(taskSnapshot -> fileRef.getDownloadUrl().addOnSuccessListener(downloadUri -> {
@@ -310,6 +310,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             userName = snapshot.child("name").getValue(String.class);
+                            userID = snapshot.child("userId").getValue(String.class);
                         }
                         uploadFileToFirebase();
                     }
@@ -363,7 +364,8 @@ public class TaskDetailsActivity extends AppCompatActivity {
                 InputStream inputStream = connection.getInputStream();
 
                 // Save the file to cache directory
-                File pdfFile = new File(getCacheDir(), "downloaded_temp.pdf");
+                File pdfFile = new File(getCacheDir(), "downloaded_temp_" + System.currentTimeMillis() + ".pdf");
+
                 FileOutputStream outputStream = new FileOutputStream(pdfFile);
 
                 byte[] buffer = new byte[1024];
@@ -410,6 +412,10 @@ public class TaskDetailsActivity extends AppCompatActivity {
                                 .addOnCompleteListener(task -> {
                                     if (task.isSuccessful()) {
                                         binding.submitButton.setText("Submitted");
+                                        binding.uploadFile.setText("File Uploaded");
+                                        binding.uploadFile.setCompoundDrawablesWithIntrinsicBounds(R.drawable.uplaod_done, 0, 0, 0);
+                                        binding.uploadFile.setClickable(false);
+                                        binding.submitButton.setClickable(false);
                                         Log.d("TaskStatusUpdate", "Task status updated successfully.");
                                     } else {
                                         Log.e("TaskStatusUpdate", "Failed to update task status: " + task.getException().getMessage());
@@ -449,7 +455,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
                         if(uploadedFileUri!=null && uploadedFileName!=null){
                             binding.uploadedFileName.setText(uploadedFileName);
                             String finalFileUri = uploadedFileUri;
-                            Log.d("uriCheck", "onDataChange: " + finalFileUri);
+                            Log.d("uriCheck", "uploadedFile uri: " + finalFileUri);
                             checkIfRemoteFileIsPdf(finalFileUri, isPdf -> {
                                 if (isPdf) {
                                     downloadAndDisplayPdf(finalFileUri, new BitmapCallback() {

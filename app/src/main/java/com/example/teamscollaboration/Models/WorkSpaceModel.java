@@ -10,12 +10,14 @@ public class WorkSpaceModel implements Serializable {
     String priority = null;
     Long created_at = null;
     String adminId = null;
+    String adminName = null;
     List<MembersModel> membersList;
     String TeamLeader = null;
     String workSpaceKey = null;
+    String adminImage = null;
 
     public WorkSpaceModel(String workSpaceKey, String workSpaceName, String workSpaceDescription, String deadLine, String priority,
-                          Long created_at, String adminId, List<MembersModel> membersList, String teamLeader) {
+                          Long created_at, String adminId, String adminName, List<MembersModel> membersList, String teamLeader, String adminImage) {
         this.workSpaceKey = workSpaceKey;
         this.workSpaceName = workSpaceName;
         this.workSpaceDescription = workSpaceDescription;
@@ -23,26 +25,29 @@ public class WorkSpaceModel implements Serializable {
         this.priority = priority;
         this.created_at = created_at;
         this.adminId = adminId;
+        this.adminName = adminName;
         this.membersList = membersList;
-        TeamLeader = teamLeader;
+        this.TeamLeader = teamLeader;
+        this.adminImage = adminImage;
     }
 
     public WorkSpaceModel() {
     }
 
-    @Override
-    public String toString() {
-        return "WorkSpaceModel{" +
-                "workSpaceName='" + workSpaceName + '\'' +
-                ", workSpaceDescription='" + workSpaceDescription + '\'' +
-                ", deadLine='" + deadLine + '\'' +
-                ", priority='" + priority + '\'' +
-                ", created_at=" + created_at +
-                ", adminId='" + adminId + '\'' +
-                ", membersList=" + membersList +
-                ", TeamLeader='" + TeamLeader + '\'' +
-                ", workSpaceKey='" + workSpaceKey + '\'' +
-                '}';
+    public String getAdminImage() {
+        return adminImage;
+    }
+
+    public void setAdminImage(String adminImage) {
+        this.adminImage = adminImage;
+    }
+
+    public String getAdminName() {
+        return adminName;
+    }
+
+    public void setAdminName(String adminName) {
+        this.adminName = adminName;
     }
 
     public String getWorkSpaceKey() {

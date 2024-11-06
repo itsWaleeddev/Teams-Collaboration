@@ -29,11 +29,6 @@ import java.util.List;
 
 public class AllMembersActivity extends AppCompatActivity {
     ActivityAllMembersBinding binding;
-    FirebaseAuth auth;
-    DatabaseReference databaseReference;
-    String workSpaceKey = null;
-    List<MembersModel> membersModelList = new ArrayList<>();
-    WorkSpaceModel workSpaceModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +44,6 @@ public class AllMembersActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-        auth = FirebaseAuth.getInstance();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-        retrieveMembers();
     }
 
     @Override
@@ -60,32 +52,5 @@ public class AllMembersActivity extends AppCompatActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void retrieveMembers() {
-        workSpaceKey = getIntent().getStringExtra("workSpaceKey");
-        databaseReference.child("Workspaces").child(workSpaceKey).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    workSpaceModel = snapshot.getValue(WorkSpaceModel.class);
-                    if (workSpaceModel != null) {
-                        membersModelList = workSpaceModel.getMembersList();
-                    }
-                    setAdapter();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.d("dataBaseError", "onCancelled: " + error.getMessage());
-            }
-        });
-    }
-
-    private void setAdapter() {
-        binding.myRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        AllMembersAdapter adapter = new AllMembersAdapter(this, membersModelList, workSpaceModel);
-        binding.myRecyclerView.setAdapter(adapter);
     }
 }
