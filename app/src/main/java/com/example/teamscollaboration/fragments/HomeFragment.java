@@ -38,7 +38,6 @@ public class HomeFragment extends Fragment {
     FirebaseAuth auth;
     List<WorkSpaceModel> workSpaceModelList = new ArrayList<>();
     WorkSpaceAdapter workSpaceAdapter;
-    String role = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,12 +69,9 @@ public class HomeFragment extends Fragment {
                     UserModel userModel = snapshot.getValue(UserModel.class);
                     binding.userName.setText(userModel.getName());
                     Glide.with(requireContext()).load(userModel.getUserImage()).into(binding.userProfile);
-                    binding.Role.setText(userModel.getRole());
-                    role = userModel.getRole();
-                    if (role != null) {
-                        setAdapter();
-                        retrieveWorkSpaces();
-                    }
+                    setAdapter();
+                    retrieveWorkSpaces();
+
                 }
             }
 
@@ -94,11 +90,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void retrieveWorkSpaces() {
-        if (role.equals("Admin")) {
-            retrieveAdminWorkSpaces();
-        } else {
-            retrieveTeamWorkSpaces();
-        }
+        retrieveAdminWorkSpaces(); //For retrieving workspaces in which user is admin
+        retrieveTeamWorkSpaces();  //For retrieving workspaces in which user is member
     }
 
     private void retrieveAdminWorkSpaces() {
@@ -115,10 +108,9 @@ public class HomeFragment extends Fragment {
                         workSpaceModelList.add(workspace);
                         workSpaceAdapter.notifyDataSetChanged();
                     }
-                }
-                 else {
+                } else {
                     // Handle no matching workspaces
-                    Toast.makeText(requireContext(), "No workspace found", Toast.LENGTH_SHORT).show();
+                    Log.d("adminCheck", "onDataChange:  user is not admin in any workspace" );
                 }
             }
 
@@ -141,9 +133,9 @@ public class HomeFragment extends Fragment {
                     for (DataSnapshot workspaceSnapshot : dataSnapshot.getChildren()) {
                         // Access the memberList child inside each workspace
                         DataSnapshot memberListSnapshot = workspaceSnapshot.child("membersList");
-                        for(DataSnapshot member : memberListSnapshot.getChildren()){
+                        for (DataSnapshot member : memberListSnapshot.getChildren()) {
                             MembersModel membersModel = member.getValue(MembersModel.class);
-                            if (membersModel!=null && membersModel.getuID().equals(auth.getCurrentUser().getUid())) {
+                            if (membersModel != null && membersModel.getuID().equals(auth.getCurrentUser().getUid())) {
                                 // If it matches, get the workspace data
                                 WorkSpaceModel workspace = workspaceSnapshot.getValue(WorkSpaceModel.class);
 
@@ -156,7 +148,7 @@ public class HomeFragment extends Fragment {
                     }
                     // Handle case where no matching workspaces are found
                     if (workSpaceModelList.isEmpty() && getActivity() != null && isAdded()) {
-                        Toast.makeText(requireContext(), "No workspace found", Toast.LENGTH_SHORT).show();
+                        Log.d("adminCheck", "onDataChange:  user is  admin in all workspace" );
                     }
                 }
             }

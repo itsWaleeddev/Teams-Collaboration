@@ -93,13 +93,12 @@ public class ChooseMembers extends AppCompatActivity {
                     String userId = oneSnapShot.getKey();
                     if (!userId.equals(currentUserId)) {
                         String name = oneSnapShot.child("name").getValue(String.class);
-                        String role = oneSnapShot.child("role").getValue(String.class);
                         String uID = oneSnapShot.child("userId").getValue(String.class);
                         String email = oneSnapShot.child("email").getValue(String.class);
                         String imageUrl = oneSnapShot.child("userImage").getValue(String.class);
                         String about = oneSnapShot.child("about").getValue(String.class);
-                        if (!role.equals("Admin")) {
-                            MembersModel membersModel = new MembersModel(email, uID, name, false, role, imageUrl, about, false, null);
+                        if (!(uID.equals(auth.getCurrentUser().getUid()))) {
+                            MembersModel membersModel = new MembersModel(email, uID, name, false, "member", imageUrl, about, false, null);
                             membersModelList.add(membersModel);
                             adapter.notifyDataSetChanged();
                         }

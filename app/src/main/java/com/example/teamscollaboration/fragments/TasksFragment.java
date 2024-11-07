@@ -67,7 +67,9 @@ public class TasksFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        retrieveRole();
+        if(!(workSpaceModel.getAdminId().equals(auth.getCurrentUser().getUid()))){
+            binding.addTask.setVisibility(View.GONE);
+        }
         retrieveTaskData();
 
     }
@@ -104,22 +106,5 @@ public class TasksFragment extends Fragment {
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
         WorkSpaceDetailsAdapter workSpaceDetailsAdapter = new WorkSpaceDetailsAdapter(requireActivity(), tasksModelList);
         binding.recyclerView.setAdapter(workSpaceDetailsAdapter);
-    }
-    private void retrieveRole(){
-        databaseReference.child("Users").child(auth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    UserModel userModel = snapshot.getValue(UserModel.class);
-                    if(userModel.getRole().equals("Team Member")){
-                        binding.addTask.setVisibility(View.GONE);
-                    }
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.d("databaseError", "onCancelled: " + error.getMessage());
-            }
-        });
     }
 }

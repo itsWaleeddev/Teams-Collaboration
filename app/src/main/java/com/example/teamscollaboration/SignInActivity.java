@@ -62,7 +62,6 @@ public class SignInActivity extends AppCompatActivity {
     StorageReference storageReference;
     FirebaseAuth auth;
     String name = null;
-    String role = null;
     String uId = null;
     String email = null;
     Uri userImage = null;
@@ -101,9 +100,8 @@ public class SignInActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 name = binding.name.getText().toString().trim();
-                role = binding.role.getSelectedItem().toString().trim();
                 Log.d("nameCheck", "onClick: " + name);
-                if (!name.isEmpty() && !role.isEmpty()) {
+                if (!name.isEmpty()) {
                     Intent signInIntent = googleSignInClient.getSignInIntent();
                     launcher.launch(signInIntent);
                 } else {
@@ -119,16 +117,6 @@ public class SignInActivity extends AppCompatActivity {
                 launcher.launch(signInIntent);
             }
         });
-        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, R.layout.spinner_item,
-                getResources().getTextArray(R.array.role_options)) {
-            @Override
-            public View getDropDownView(int position, View convertView, ViewGroup parent) {
-                View view = super.getDropDownView(position, convertView, parent);
-                view.setBackgroundColor(Color.WHITE); // Set the background color of the dropdown
-                return view;
-            }
-        };
-        binding.role.setAdapter(adapter);
     }
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
@@ -169,14 +157,12 @@ public class SignInActivity extends AppCompatActivity {
 
     public void updateUi() {
         Intent intent = new Intent(SignInActivity.this, MainActivity.class);
-        intent.putExtra("role",role);
         startActivity(intent);
         finish();
     }
 
     private void saveUserData() {
         name = binding.name.getText().toString().trim();
-        role = binding.role.getSelectedItem().toString().trim();
         uId = auth.getCurrentUser().getUid();
         email = auth.getCurrentUser().getEmail();
         userImage = auth.getCurrentUser().getPhotoUrl();
@@ -192,7 +178,7 @@ public class SignInActivity extends AppCompatActivity {
                         imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
-                                UserModel usermodel = new UserModel(uId, name, role, email, userImage.toString(), "");
+                                UserModel usermodel = new UserModel(uId, name, email, userImage.toString(), "");
                                 if (auth.getCurrentUser() != null) {
                                     databaseReference.child("Users").child(uId).setValue(usermodel).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override

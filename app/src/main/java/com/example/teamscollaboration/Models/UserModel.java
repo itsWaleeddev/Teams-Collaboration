@@ -3,15 +3,13 @@ package com.example.teamscollaboration.Models;
 public class UserModel {
     String userId = null;
     String name = null;
-    String role = null;
     String email = null;
     String userImage = null;
     String about = null;
 
-    public UserModel(String userId, String name, String role, String email, String userImage, String about) {
+    public UserModel(String userId, String name, String email, String userImage, String about) {
         this.userId = userId;
         this.name = name;
-        this.role = role;
         this.email = email;
         this.userImage = userImage;
         this.about = about;
@@ -50,14 +48,6 @@ public class UserModel {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 
     public String getEmail() {
