@@ -1,6 +1,8 @@
 package com.example.teamscollaboration;
 
+import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.pdf.PdfRenderer;
@@ -13,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -30,6 +33,7 @@ import java.net.URL;
 
 public class SubmissionDetailsActivity extends AppCompatActivity {
     ActivitySubmissionDetailsBinding binding;
+    File pdfFile = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +60,23 @@ public class SubmissionDetailsActivity extends AppCompatActivity {
                 Glide.with(this).load(Uri.parse(taskUploadModel.getFileUri())).into(binding.fileImage);
             }
         });
+        binding.fileImage.setOnClickListener(view -> {
+            if(pdfFile!=null){
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                Uri pdfUri = FileProvider.getUriForFile(this, "com.example.teamscollaboration.fileprovider", pdfFile);
+                intent.setDataAndType(pdfUri, "application/pdf");
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                try {
+                    startActivity(intent);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(this, "No PDF viewer found. Please install one to open this file.", Toast.LENGTH_SHORT).show();
+                }
+            }
+            else{
+                Toast.makeText(this, "Wait for the file to load", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
     private void downloadAndDisplayPdf(String url) {
         new Thread(() -> {
@@ -67,7 +88,7 @@ public class SubmissionDetailsActivity extends AppCompatActivity {
                 InputStream inputStream = connection.getInputStream();
 
                 // Save the file to cache directory
-                File pdfFile = new File(getCacheDir(), "downloaded_temp.pdf");
+                pdfFile = new File(getCacheDir(), "downloaded_temp.pdf");
                 FileOutputStream outputStream = new FileOutputStream(pdfFile);
 
                 byte[] buffer = new byte[1024];
@@ -149,4 +170,5 @@ public class SubmissionDetailsActivity extends AppCompatActivity {
             return null;
         }
     }
+
 }
