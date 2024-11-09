@@ -87,44 +87,66 @@ public class SubmissionDetailsActivity extends AppCompatActivity {
 
     }
     private void downloadAndDisplayPdf(String url) {
-        new Thread(() -> {
-            try {
-                // Step 1: Download the PDF file
-                URL pdfUrl = new URL(url);
-                HttpURLConnection connection = (HttpURLConnection) pdfUrl.openConnection();
-                connection.connect();
-                InputStream inputStream = connection.getInputStream();
+        // Create a unique filename based on the URL (or other unique identifier)
+        String fileName = getCacheFileName(url);
+        File cachedPdfFile = new File(getCacheDir(), fileName);
 
-                // Save the file to cache directory
-                pdfFile = new File(getCacheDir(), "downloaded_temp.pdf");
-                FileOutputStream outputStream = new FileOutputStream(pdfFile);
-
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, bytesRead);
+        // Check if the file exists in the cache
+        if (cachedPdfFile.exists()) {
+            // If the file is already cached, directly use it
+            runOnUiThread(() -> {
+                pdfFile = cachedPdfFile;
+                Bitmap bitmap = displayPdfFirstPage(Uri.fromFile(cachedPdfFile));
+                if (bitmap != null) {
+                    binding.fileImage.setImageBitmap(bitmap);
+                } else {
+                    Toast.makeText(this, "File loading failed", Toast.LENGTH_SHORT).show();
                 }
 
-                outputStream.close();
-                inputStream.close();
+            });
+        } else {
+            // If the file is not cached, download and save it
+            new Thread(() -> {
+                try {
+                    // Step 1: Download the PDF file
+                    URL pdfUrl = new URL(url);
+                    HttpURLConnection connection = (HttpURLConnection) pdfUrl.openConnection();
+                    connection.connect();
+                    InputStream inputStream = connection.getInputStream();
 
-                // Step 2: Render the first page of the PDF
-                Bitmap bitmap = displayPdfFirstPage(Uri.fromFile(pdfFile));
-
-                // Step 3: Update the ImageView on the main thread
-                runOnUiThread(() -> {
-                    if (bitmap != null) {
-                        binding.fileImage.setImageBitmap(bitmap);
-                    } else {
-                        Toast.makeText(this, "Failed to render PDF page", Toast.LENGTH_SHORT).show();
+                    // Save the file to cache directory
+                    FileOutputStream outputStream = new FileOutputStream(cachedPdfFile);
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
                     }
-                });
 
-            } catch (IOException e) {
-                e.printStackTrace();
-                runOnUiThread(() -> Toast.makeText(this, "Error downloading PDF", Toast.LENGTH_SHORT).show());
-            }
-        }).start();
+                    outputStream.close();
+                    inputStream.close();
+
+                    // Step 2: Notify the callback that the PDF file is ready
+                    runOnUiThread(() -> {
+                       pdfFile = cachedPdfFile;
+                    });
+
+                    // Step 3: Render the first page of the PDF and display it
+                    Bitmap bitmap = displayPdfFirstPage(Uri.fromFile(cachedPdfFile));
+
+                    runOnUiThread(() -> {
+                        if (bitmap != null) {
+                            binding.fileImage.setImageBitmap(bitmap);
+                        } else {
+                            Toast.makeText(this, "File loading failed", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    runOnUiThread(() -> Toast.makeText(this, "Error downloading PDF", Toast.LENGTH_SHORT).show());
+                }
+            }).start();
+        }
     }
     private void checkIfRemoteFileIsPdf(String url, TaskDetailsActivity.PdfCheckCallback callback) {
         new Thread(() -> {
@@ -178,5 +200,8 @@ public class SubmissionDetailsActivity extends AppCompatActivity {
             return null;
         }
     }
-
+    // Helper method to generate a unique cache file name based on the URL
+    private String getCacheFileName(String url) {
+        return String.valueOf(url.hashCode()) + ".pdf";
+    }
 }
