@@ -54,6 +54,7 @@ dependencies {
     implementation ("de.hdodenhof:circleimageview:3.1.0")
     //glide
     implementation ("com.github.bumptech.glide:glide:4.16.0")
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

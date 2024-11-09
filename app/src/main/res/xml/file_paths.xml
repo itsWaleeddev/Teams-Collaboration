@@ -4,4 +4,9 @@
     <cache-path
         name="cache"
         path="." />
+    <external-path
+        name="external_files"
+        path="." />
+    <!-- Allow access to files under external storage -->
 </paths>
+

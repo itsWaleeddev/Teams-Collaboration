@@ -1,5 +1,6 @@
 package com.example.teamscollaboration.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,11 +16,13 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.teamscollaboration.Adapters.WorkSpaceAdapter;
+import com.example.teamscollaboration.ImageViewerActivity;
 import com.example.teamscollaboration.MainActivity;
 import com.example.teamscollaboration.Models.MembersModel;
 import com.example.teamscollaboration.Models.UserModel;
 import com.example.teamscollaboration.Models.WorkSpaceModel;
 import com.example.teamscollaboration.R;
+import com.example.teamscollaboration.TaskDetailsActivity;
 import com.example.teamscollaboration.databinding.FragmentHomeBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -69,6 +72,14 @@ public class HomeFragment extends Fragment {
                     UserModel userModel = snapshot.getValue(UserModel.class);
                     binding.userName.setText(userModel.getName());
                     Glide.with(requireContext()).load(userModel.getUserImage()).into(binding.userProfile);
+                    binding.userProfile.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(requireActivity(), ImageViewerActivity.class);
+                            intent.putExtra("image_url", userModel.getUserImage()); // Passed the image URL to the new activity
+                            startActivity(intent);
+                        }
+                    });
                     setAdapter();
                     retrieveWorkSpaces();
 

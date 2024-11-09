@@ -56,24 +56,32 @@ public class SubmissionDetailsActivity extends AppCompatActivity {
         checkIfRemoteFileIsPdf(taskUploadModel.getFileUri(), isPdf -> {
             if (isPdf) {
                 downloadAndDisplayPdf(taskUploadModel.getFileUri());
+                binding.fileImage.setOnClickListener(view -> {
+                    if(pdfFile!=null && pdfFile.exists()){
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        Uri pdfUri = FileProvider.getUriForFile(this, "com.example.teamscollaboration.fileprovider", pdfFile);
+                        intent.setDataAndType(pdfUri, "application/pdf");
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        try {
+                            startActivity(intent);
+                        } catch (ActivityNotFoundException e) {
+                            Toast.makeText(this, "No PDF viewer found. Please install one to open this file.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else{
+                        Toast.makeText(this, "Wait for the file to load", Toast.LENGTH_SHORT).show();
+                    }
+                });
             } else {
                 Glide.with(this).load(Uri.parse(taskUploadModel.getFileUri())).into(binding.fileImage);
-            }
-        });
-        binding.fileImage.setOnClickListener(view -> {
-            if(pdfFile!=null){
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                Uri pdfUri = FileProvider.getUriForFile(this, "com.example.teamscollaboration.fileprovider", pdfFile);
-                intent.setDataAndType(pdfUri, "application/pdf");
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                try {
-                    startActivity(intent);
-                } catch (ActivityNotFoundException e) {
-                    Toast.makeText(this, "No PDF viewer found. Please install one to open this file.", Toast.LENGTH_SHORT).show();
-                }
-            }
-            else{
-                Toast.makeText(this, "Wait for the file to load", Toast.LENGTH_SHORT).show();
+                binding.fileImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(SubmissionDetailsActivity.this, ImageViewerActivity.class);
+                        intent.putExtra("image_url", taskUploadModel.getFileUri()); // Passed the image URL to the new activity
+                        startActivity(intent);
+                    }
+                });
             }
         });
 

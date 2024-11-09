@@ -22,10 +22,12 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.teamscollaboration.ImageViewerActivity;
 import com.example.teamscollaboration.MainActivity;
 import com.example.teamscollaboration.Models.UserModel;
 import com.example.teamscollaboration.R;
 import com.example.teamscollaboration.SignInActivity;
+import com.example.teamscollaboration.TaskDetailsActivity;
 import com.example.teamscollaboration.databinding.FragmentProfileBinding;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -130,6 +132,16 @@ public class ProfileFragment extends Fragment {
 
             }
         });
+        if(imageUri!=null){
+            binding.userImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(requireActivity(), ImageViewerActivity.class);
+                    intent.putExtra("image_url",imageUri);// Passed the image URL to the new activity
+                    startActivity(intent);
+                }
+            });
+        }
     }
 
     private ActivityResultLauncher<String> pickImage = registerForActivityResult(new ActivityResultContracts.GetContent(),
@@ -164,6 +176,14 @@ public class ProfileFragment extends Fragment {
                         binding.userNameInput.setText(userModel.getName());
                         binding.DescriptionInput.setText(userModel.getAbout());
                         Glide.with(requireContext()).load(userModel.getUserImage()).into(binding.userImage);
+                        binding.userImage.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Intent intent = new Intent(requireContext(), ImageViewerActivity.class);
+                                intent.putExtra("image_url", userModel.getUserImage()); // Passed the image URL to the new activity
+                                startActivity(intent);
+                            }
+                        });
                     }
                 }
             }

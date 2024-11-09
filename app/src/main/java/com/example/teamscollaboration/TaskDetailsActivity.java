@@ -1,11 +1,14 @@
 package com.example.teamscollaboration;
 
+import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.PorterDuff;
 import android.graphics.pdf.PdfRenderer;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +24,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -80,9 +84,33 @@ public class TaskDetailsActivity extends AppCompatActivity {
                     if (isPdfFile(selectedFileUri)) {
                         Bitmap bitmap = displayPdfFirstPage(selectedFileUri);
                         binding.uploadedFile.setImageBitmap(bitmap);
+                        binding.uploadedFile.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                // Create an intent to view the PDF file directly using the content URI
+                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                intent.setDataAndType(selectedFileUri, "application/pdf");
+                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // Grant permission to read the file
+
+                                // Check if there is a PDF viewer available
+                                try {
+                                    startActivity(intent);
+                                } catch (ActivityNotFoundException e) {
+                                    Toast.makeText(TaskDetailsActivity.this, "No PDF viewer found. Please install one to open this file.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
                     } else if (isImageFile(selectedFileUri)) {
                         Bitmap bitmap = displayImage(selectedFileUri);
                         binding.uploadedFile.setImageBitmap(bitmap);
+                        binding.uploadedFile.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Intent intent = new Intent(TaskDetailsActivity.this, ImageViewerActivity.class);
+                                intent.putExtra("image_url", selectedFileUri.toString()); // Passed the image URL to the new activity
+                                startActivity(intent);
+                            }
+                        });
                     }
                 }
             }
@@ -132,12 +160,43 @@ public class TaskDetailsActivity extends AppCompatActivity {
                     public void onError(String error) {
                         Toast.makeText(TaskDetailsActivity.this, error, Toast.LENGTH_SHORT).show();
                     }
-                });
+                }, new pdfFileCallback() {
+                    @Override
+                    public void pdfFileReady(File pdfFile) {
+                        binding.taskFile.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                Uri pdfUri = FileProvider.getUriForFile(TaskDetailsActivity.this, "com.example.teamscollaboration.fileprovider", pdfFile);
+                                intent.setDataAndType(pdfUri, "application/pdf");
+                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                try {
+                                    startActivity(intent);
+                                } catch (ActivityNotFoundException e) {
+                                    Toast.makeText(TaskDetailsActivity.this, "No PDF viewer found. Please install one to open this file.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
 
+                    @Override
+                    public void onError(String error) {
+                        Toast.makeText(TaskDetailsActivity.this, error, Toast.LENGTH_SHORT).show();
+                    }
+                });
             } else {
-               Glide.with(this).load(uri).into(binding.taskFile);
+                Glide.with(this).load(uri).into(binding.taskFile);
+                binding.taskFile.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(TaskDetailsActivity.this, ImageViewerActivity.class);
+                        intent.putExtra("image_url", uri.toString()); // Passed the image URL to the new activity
+                        startActivity(intent);
+                    }
+                });
             }
         });
+
 
         binding.taskFileName.setText(tasksModel.getFileName());
         binding.taskDeadline.setText(tasksModel.getDeadLine());
@@ -212,6 +271,11 @@ public class TaskDetailsActivity extends AppCompatActivity {
         try {
             InputStream inputStream = getContentResolver().openInputStream(uri);
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            // Get the EXIF orientation (if any) and correct the bitmap orientation
+            int orientation = getExifOrientation(uri);
+            if (orientation != 0) {
+                bitmap = rotateBitmap(bitmap, orientation);
+            }
             return bitmap;
         } catch (Exception e) {
             e.printStackTrace();
@@ -354,7 +418,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
 
 
 
-    private void downloadAndDisplayPdf(String url, BitmapCallback callback) {
+    private void downloadAndDisplayPdf(String url, BitmapCallback callback, pdfFileCallback pdfCallback) {
         new Thread(() -> {
             try {
                 // Step 1: Download the PDF file
@@ -365,9 +429,14 @@ public class TaskDetailsActivity extends AppCompatActivity {
 
                 // Save the file to cache directory
                 File pdfFile = new File(getCacheDir(), "downloaded_temp_" + System.currentTimeMillis() + ".pdf");
-
                 FileOutputStream outputStream = new FileOutputStream(pdfFile);
-
+                runOnUiThread(() -> {
+                    if (pdfFile!=null && pdfFile.exists()) {
+                        pdfCallback.pdfFileReady(pdfFile);
+                    } else {
+                        callback.onError("Wait For the Pdf File to load");
+                    }
+                });
                 byte[] buffer = new byte[1024];
                 int bytesRead;
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
@@ -463,15 +532,44 @@ public class TaskDetailsActivity extends AppCompatActivity {
                                         public void onBitmapReady(Bitmap bitmap) {
                                             binding.uploadedFile.setImageBitmap(bitmap); // Display the bitmap in an ImageView
                                         }
+                                        @Override
+                                        public void onError(String error) {
+                                            Toast.makeText(TaskDetailsActivity.this, error, Toast.LENGTH_SHORT).show();
+                                        }
+                                    }, new pdfFileCallback() {
+                                        @Override
+                                        public void pdfFileReady(File pdfFile) {
+                                            binding.uploadedFile.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                                    Uri pdfUri = FileProvider.getUriForFile(TaskDetailsActivity.this, "com.example.teamscollaboration.fileprovider", pdfFile);
+                                                    intent.setDataAndType(pdfUri, "application/pdf");
+                                                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                                    try {
+                                                        startActivity(intent);
+                                                    } catch (ActivityNotFoundException e) {
+                                                        Toast.makeText(TaskDetailsActivity.this, "No PDF viewer found. Please install one to open this file.", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            });
+                                        }
 
                                         @Override
                                         public void onError(String error) {
                                             Toast.makeText(TaskDetailsActivity.this, error, Toast.LENGTH_SHORT).show();
                                         }
                                     });
-
                                 } else {
                                     Glide.with(TaskDetailsActivity.this).load(Uri.parse(finalFileUri)).into(binding.uploadedFile);
+                                    binding.uploadedFile.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            Intent intent = new Intent(TaskDetailsActivity.this, ImageViewerActivity.class);
+                                            intent.putExtra("image_url", finalFileUri); // Passed the image URL to the new activity
+                                            startActivity(intent);
+                                        }
+                                    });
                                 }
                             });
                         }
@@ -524,5 +622,49 @@ public class TaskDetailsActivity extends AppCompatActivity {
         void onBitmapReady(Bitmap bitmap);
         void onError(String error);
     }
+    public interface pdfFileCallback {
+       void pdfFileReady(File pdfFile);
+        void onError(String error);
+    }
+    private int getExifOrientation(Uri uri) {
+        try {
+            // Get the EXIF metadata from the image
+            ExifInterface exif = new ExifInterface(getContentResolver().openInputStream(uri));
 
+            // Retrieve the orientation tag from EXIF data
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+            return orientation;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return 0; // Return 0 if no EXIF data is found
+        }
+    }
+
+    private Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
+        Matrix matrix = new Matrix();
+
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.postRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                matrix.postRotate(180);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.postRotate(270);
+                break;
+            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+                matrix.postScale(1, -1);
+                break;
+            default:
+                return bitmap; // No rotation needed
+        }
+
+        // Create a new bitmap with the corrected orientation
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    }
 }
