@@ -17,6 +17,9 @@
         android:theme="@style/Theme.TeamsCollaboration"
         tools:targetApi="34">
         <activity
+            android:name=".TasksPieChartsActivity"
+            android:exported="false" />
+        <activity
             android:name=".WorkSpaceGraphActivity"
             android:exported="false" />
         <activity

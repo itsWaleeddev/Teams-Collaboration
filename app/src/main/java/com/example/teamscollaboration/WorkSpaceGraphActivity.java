@@ -1,9 +1,11 @@
 package com.example.teamscollaboration;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -29,6 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,6 +57,12 @@ public class WorkSpaceGraphActivity extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference();
         String workSpaceKey = getIntent().getStringExtra("WorkSpaceKey");
         retrieveTasks(workSpaceKey);
+        binding.backArrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 
     private void retrieveTasks(String workSpaceKey) {
@@ -87,6 +96,14 @@ public class WorkSpaceGraphActivity extends AppCompatActivity {
                                     }
                                 });
                     }
+                    binding.nextButton1.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(WorkSpaceGraphActivity.this, TasksPieChartsActivity.class);
+                            intent.putExtra("TasksList",(Serializable) tasksModels);
+                            startActivity(intent);
+                        }
+                    });
                 }
             }
 
@@ -115,7 +132,7 @@ public class WorkSpaceGraphActivity extends AppCompatActivity {
             BarDataSet dataSet = new BarDataSet(entries, tasksModel.getTaskName());
             dataSet.setColor(ColorTemplate.MATERIAL_COLORS[taskIndex % ColorTemplate.MATERIAL_COLORS.length]);
             dataSet.setValueTextSize(12F);
-           // dataSet.setDrawValues(false); // Optional: hide values on bars
+            // dataSet.setDrawValues(false); // Optional: hide values on bars
 
             dataSets.add(dataSet);
         }
@@ -127,7 +144,6 @@ public class WorkSpaceGraphActivity extends AppCompatActivity {
         }
 
         barChart.setData(barData);
-
         barChart.animateY(1000); // Animate the bars appearing vertically
 
         //barChart.setExtraOffsets(5, 5, 5, 5); // Add margins if needed
@@ -172,7 +188,6 @@ public class WorkSpaceGraphActivity extends AppCompatActivity {
         barChart.setBackgroundColor(Color.WHITE); // Set background color inside the border
 
         barChart.invalidate(); // Refresh chart
-
     }
 
 }
