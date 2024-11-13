@@ -20,10 +20,13 @@ public class TasksModel implements Serializable {
     String fileUri = null;
     String fileName = null;
     ArrayList<TaskUploadModel> taskUploads;
+    int submittedCount = 0;
+    int unSubmittedCount = 0;
 
     public TasksModel(String taskKey, String taskName, String taskDescription, String deadLine, String endTime,
                       Long created_at,String ownerID, String taskOwner, List<MembersModel> membersList, String teamLeader, String workSpaceKey,
-                      String taskStatus, String fileUri, String fileName, ArrayList<TaskUploadModel> taskUploads) {
+                      String taskStatus, String fileUri, String fileName, ArrayList<TaskUploadModel> taskUploads, int submittedCount,
+                      int unSubmittedCount) {
         this.taskKey = taskKey;
         this.taskName = taskName;
         this.taskDescription = taskDescription;
@@ -39,9 +42,27 @@ public class TasksModel implements Serializable {
         this.fileUri = fileUri;
         this.fileName = fileName;
         this.taskUploads = taskUploads;
+        this.submittedCount = submittedCount;
+        this.unSubmittedCount = unSubmittedCount;
     }
 
     public TasksModel() {
+    }
+
+    public int getSubmittedCount() {
+        return submittedCount;
+    }
+
+    public void setSubmittedCount(int submittedCount) {
+        this.submittedCount = submittedCount;
+    }
+
+    public int getUnSubmittedCount() {
+        return unSubmittedCount;
+    }
+
+    public void setUnSubmittedCount(int unSubmittedCount) {
+        this.unSubmittedCount = unSubmittedCount;
     }
 
     public ArrayList<TaskUploadModel> getTaskUploads() {

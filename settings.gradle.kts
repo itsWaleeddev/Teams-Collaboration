@@ -9,6 +9,8 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        maven("https://jitpack.io")
+        jcenter() // Although it's deprecated, some dependencies may still require it
     }
 }
 dependencyResolutionManagement {
@@ -16,6 +18,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://jitpack.io")
+        jcenter() // Although it's deprecated, some dependencies may still require it
+
     }
 }
 

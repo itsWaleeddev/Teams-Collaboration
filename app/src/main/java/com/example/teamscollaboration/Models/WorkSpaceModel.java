@@ -1,6 +1,7 @@
 package com.example.teamscollaboration.Models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class WorkSpaceModel implements Serializable {
@@ -15,9 +16,11 @@ public class WorkSpaceModel implements Serializable {
     String TeamLeader = null;
     String workSpaceKey = null;
     String adminImage = null;
+    ArrayList<StreamModel> streamModel = null;
 
     public WorkSpaceModel(String workSpaceKey, String workSpaceName, String workSpaceDescription, String deadLine, String priority,
-                          Long created_at, String adminId, String adminName, List<MembersModel> membersList, String teamLeader, String adminImage) {
+                          Long created_at, String adminId, String adminName, List<MembersModel> membersList,
+                          String teamLeader, String adminImage, ArrayList<StreamModel> streamModel) {
         this.workSpaceKey = workSpaceKey;
         this.workSpaceName = workSpaceName;
         this.workSpaceDescription = workSpaceDescription;
@@ -29,9 +32,18 @@ public class WorkSpaceModel implements Serializable {
         this.membersList = membersList;
         this.TeamLeader = teamLeader;
         this.adminImage = adminImage;
+        this.streamModel = streamModel;
     }
 
     public WorkSpaceModel() {
+    }
+
+    public ArrayList<StreamModel> getStreamModel() {
+        return streamModel;
+    }
+
+    public void setStreamModel(ArrayList<StreamModel> streamModel) {
+        this.streamModel = streamModel;
     }
 
     public String getAdminImage() {

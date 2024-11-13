@@ -1,12 +1,8 @@
 package com.example.teamscollaboration;
 
-import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -16,33 +12,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.example.teamscollaboration.Adapters.WorkSpaceAdapter;
-import com.example.teamscollaboration.Adapters.WorkSpaceDetailsAdapter;
-import com.example.teamscollaboration.Models.MembersModel;
-import com.example.teamscollaboration.Models.TasksModel;
-import com.example.teamscollaboration.Models.UserModel;
 import com.example.teamscollaboration.Models.WorkSpaceModel;
 import com.example.teamscollaboration.databinding.ActivityWorkSpaceDetailsBinding;
-import com.example.teamscollaboration.fragments.AddWorkSpaceFragment;
-import com.example.teamscollaboration.fragments.ChatsFragment;
-import com.example.teamscollaboration.fragments.DashboardFragment;
-import com.example.teamscollaboration.fragments.HomeFragment;
 import com.example.teamscollaboration.fragments.MembersFragment;
-import com.example.teamscollaboration.fragments.ProfileFragment;
+import com.example.teamscollaboration.fragments.StreamFragment;
 import com.example.teamscollaboration.fragments.TasksFragment;
-import com.example.teamscollaboration.fragments.WorkspaceDetailsFragment;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import nl.joery.animatedbottombar.AnimatedBottomBar;
 
@@ -68,7 +43,7 @@ public class WorkSpaceDetails extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainerView, new TasksFragment())
+                    .replace(R.id.fragmentContainerView, new StreamFragment())
                     .commit();
         }
         binding.bottomBar.selectTabAt(0, true);
@@ -80,13 +55,13 @@ public class WorkSpaceDetails extends AppCompatActivity {
                 // Switch between fragments based on the selected tab's index
                 switch (i1) {
                     case 0:
-                        selectedFragment = new TasksFragment();
+                        selectedFragment = new StreamFragment();
                         break;
                     case 1:
-                        selectedFragment = new MembersFragment();
+                        selectedFragment = new TasksFragment();
                         break;
                     case 2:
-                        selectedFragment = new WorkspaceDetailsFragment();
+                        selectedFragment = new MembersFragment();
                         break;
                 }
 

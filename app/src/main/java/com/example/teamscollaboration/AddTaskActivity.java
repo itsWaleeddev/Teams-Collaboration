@@ -266,7 +266,8 @@ public class AddTaskActivity extends AppCompatActivity {
         // Upload the file to Firebase Storage
         TasksModel tasksModel = new TasksModel(newTaskKey, taskName,taskDescription, taskDeadline,
                  taskEndTime, System.currentTimeMillis(), auth.getCurrentUser().getUid(), userName,
-                selectedMembers, null, workSpaceKey, "pending", null, null, new ArrayList<>());
+                selectedMembers, null, workSpaceKey, "pending", null,
+                null, new ArrayList<>(), 0, selectedMembers.size());
        tasksRef.child(newTaskKey).setValue(tasksModel);
        uploadFileToFirebase(newTaskKey);
     }

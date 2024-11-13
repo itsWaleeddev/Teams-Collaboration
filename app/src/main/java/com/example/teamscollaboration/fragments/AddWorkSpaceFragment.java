@@ -154,7 +154,7 @@ public class AddWorkSpaceFragment extends Fragment {
         String newWorkSpaceKey = workSpaceRef.push().getKey();
         WorkSpaceModel workSpaceModel = new WorkSpaceModel(newWorkSpaceKey, workSpaceName, workSpaceDescription,
                 deadLine, priority, System.currentTimeMillis(), auth.getCurrentUser().getUid(),
-                userName, selectedMembers, "No Leader Yet", userImage);
+                userName, selectedMembers, "No Leader Yet", userImage, null);
         workSpaceRef.child(newWorkSpaceKey).setValue(workSpaceModel);
     }
 

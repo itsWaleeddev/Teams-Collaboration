@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/stream"
+        android:icon="@drawable/stream"
+        android:title="Stream" />
+    <item
         android:id="@+id/Tasks"
         android:icon="@drawable/task"
         android:title="Tasks" />
@@ -8,8 +12,4 @@
         android:id="@+id/Members"
         android:icon="@drawable/members"
         android:title="Members" />
-    <item
-        android:id="@+id/Details"
-        android:icon="@drawable/workspace"
-        android:title="Details" />
 </menu>

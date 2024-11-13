@@ -17,6 +17,15 @@
         android:theme="@style/Theme.TeamsCollaboration"
         tools:targetApi="34">
         <activity
+            android:name=".WorkSpaceGraphActivity"
+            android:exported="false" />
+        <activity
+            android:name=".WorkSpacesList"
+            android:exported="false" />
+        <activity
+            android:name=".AddStreamActivity"
+            android:exported="false" />
+        <activity
             android:name=".ImageViewerActivity"
             android:exported="false" />
 

@@ -355,6 +355,40 @@ public class TaskDetailsActivity extends AppCompatActivity {
                         .addOnSuccessListener(aVoid -> {
                             // Success handling
                             Toast.makeText(this, "Task upload added successfully.", Toast.LENGTH_SHORT).show();
+                            DatabaseReference taskRef = databaseReference.child("Tasks").child(workSpaceKey).child(newTaskKey);
+
+                            // Increment submittedCount
+                            taskRef.child("submittedCount").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot snapshot) {
+                                    Integer currentSubmittedCount = snapshot.getValue(Integer.class);
+                                    if (currentSubmittedCount != null) {
+                                        taskRef.child("submittedCount").setValue(currentSubmittedCount + 1);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError error) {
+                                    // Handle error if needed
+                                }
+                            });
+
+                            // Decrement unSubmittedCount
+                            taskRef.child("unSubmittedCount").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot snapshot) {
+                                    Integer currentUnSubmittedCount = snapshot.getValue(Integer.class);
+                                    if (currentUnSubmittedCount != null) {
+                                        taskRef.child("unSubmittedCount").setValue(currentUnSubmittedCount - 1);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError error) {
+                                    // Handle error if needed
+                                }
+                            });
+
                         })
                         .addOnFailureListener(e -> {
                             // Failure handling

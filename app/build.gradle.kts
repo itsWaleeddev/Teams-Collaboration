@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.gms)
 }
-
 android {
     namespace = "com.example.teamscollaboration"
     compileSdk = 34
@@ -53,6 +52,8 @@ dependencies {
     implementation ("de.hdodenhof:circleimageview:3.1.0")
     //glide
     implementation ("com.github.bumptech.glide:glide:4.16.0")
+    //graphs
+    implementation ("com.github.PhilJay:MPAndroidChart:3.1.0")
 
     implementation(libs.appcompat)
     implementation(libs.material)
