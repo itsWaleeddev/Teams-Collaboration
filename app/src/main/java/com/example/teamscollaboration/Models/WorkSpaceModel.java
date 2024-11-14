@@ -38,6 +38,24 @@ public class WorkSpaceModel implements Serializable {
     public WorkSpaceModel() {
     }
 
+    @Override
+    public String toString() {
+        return "WorkSpaceModel{" +
+                "workSpaceName='" + workSpaceName + '\'' +
+                ", workSpaceDescription='" + workSpaceDescription + '\'' +
+                ", deadLine='" + deadLine + '\'' +
+                ", priority='" + priority + '\'' +
+                ", created_at=" + created_at +
+                ", adminId='" + adminId + '\'' +
+                ", adminName='" + adminName + '\'' +
+                ", membersList=" + membersList +
+                ", TeamLeader='" + TeamLeader + '\'' +
+                ", workSpaceKey='" + workSpaceKey + '\'' +
+                ", adminImage='" + adminImage + '\'' +
+                ", streamModel=" + streamModel +
+                '}';
+    }
+
     public ArrayList<StreamModel> getStreamModel() {
         return streamModel;
     }

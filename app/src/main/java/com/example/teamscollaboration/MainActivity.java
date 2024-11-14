@@ -1,10 +1,6 @@
 package com.example.teamscollaboration;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.view.animation.Animation;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -15,29 +11,13 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.bumptech.glide.Glide;
-import com.example.teamscollaboration.Adapters.WorkSpaceAdapter;
-import com.example.teamscollaboration.Models.UserModel;
-import com.example.teamscollaboration.Models.WorkSpaceModel;
 import com.example.teamscollaboration.databinding.ActivityMainBinding;
 import com.example.teamscollaboration.fragments.AddWorkSpaceFragment;
-import com.example.teamscollaboration.fragments.ChatsFragment;
+import com.example.teamscollaboration.fragments.CalendarFragment;
 import com.example.teamscollaboration.fragments.DashboardFragment;
 import com.example.teamscollaboration.fragments.HomeFragment;
 import com.example.teamscollaboration.fragments.ProfileFragment;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import nl.joery.animatedbottombar.AnimatedBottomBar;
 
@@ -81,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                         selectedFragment = new HomeFragment();
                         break;
                     case 1:
-                        selectedFragment = new ChatsFragment();
+                        selectedFragment = new CalendarFragment();
                         break;
                     case 2:
                         selectedFragment = new AddWorkSpaceFragment();

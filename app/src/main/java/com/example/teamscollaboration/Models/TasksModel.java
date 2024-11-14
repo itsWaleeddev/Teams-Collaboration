@@ -49,6 +49,29 @@ public class TasksModel implements Serializable {
     public TasksModel() {
     }
 
+    @Override
+    public String toString() {
+        return "TasksModel{" +
+                "taskKey='" + taskKey + '\'' +
+                ", taskName='" + taskName + '\'' +
+                ", taskDescription='" + taskDescription + '\'' +
+                ", deadLine='" + deadLine + '\'' +
+                ", endTime='" + endTime + '\'' +
+                ", created_at=" + created_at +
+                ", ownerID='" + ownerID + '\'' +
+                ", taskOwner='" + taskOwner + '\'' +
+                ", membersList=" + membersList +
+                ", TeamLeader='" + TeamLeader + '\'' +
+                ", workSpaceKey='" + workSpaceKey + '\'' +
+                ", taskStatus='" + taskStatus + '\'' +
+                ", fileUri='" + fileUri + '\'' +
+                ", fileName='" + fileName + '\'' +
+                ", taskUploads=" + taskUploads +
+                ", submittedCount=" + submittedCount +
+                ", unSubmittedCount=" + unSubmittedCount +
+                '}';
+    }
+
     public int getSubmittedCount() {
         return submittedCount;
     }

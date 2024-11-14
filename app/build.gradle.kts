@@ -54,6 +54,8 @@ dependencies {
     implementation ("com.github.bumptech.glide:glide:4.16.0")
     //graphs
     implementation ("com.github.PhilJay:MPAndroidChart:3.1.0")
+    //material calendar
+    implementation ("com.github.prolificinteractive:material-calendarview:2.0.0")
 
     implementation(libs.appcompat)
     implementation(libs.material)
