@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PorterDuff;
 import android.graphics.pdf.PdfRenderer;
@@ -206,7 +207,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
         binding.uploadFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(taskStatus.equals("pending")) {
+                if(taskStatus.equals("Pending")) {
                     openFileChooser();
                 }
             }
@@ -214,7 +215,17 @@ public class TaskDetailsActivity extends AppCompatActivity {
         binding.submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(taskStatus.equals("pending")){
+                if(taskStatus.equals("Pending")){
+                    binding.interactionBlocker.setVisibility(View.VISIBLE);
+                    binding.uploadProgressBar.setVisibility(View.VISIBLE);
+                    binding.uploadProgressBar.bringToFront();
+                    binding.submitButton.setClickable(false);
+                    binding.uploadFile.setClickable(false);
+                    binding.uploadedFile.setClickable(false);
+                    binding.uploadedFile.setBackgroundColor(Color.TRANSPARENT);
+                    binding.uploadFile.setFocusable(false);
+                    binding.taskFile.setClickable(false);
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                     retrieveUser();
                 }
             }
@@ -309,8 +320,8 @@ public class TaskDetailsActivity extends AppCompatActivity {
 
     private void uploadFileToFirebase() {
         if (selectedFileUri != null) {
-            StorageReference storageRef = FirebaseStorage.getInstance().getReference("Workspaces/Tasks/"+ newTaskKey + "/Uploaded_Tasks/" + userID +"/");
-            StorageReference fileRef = storageRef.child(userID + "." + getFileExtension(selectedFileUri));
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference("Workspaces/"+ workSpaceKey + "/Tasks/" + newTaskKey +"/Uploaded_Tasks/"+ userID + "/");
+            StorageReference fileRef = storageRef.child(userName + "." + getFileExtension(selectedFileUri));
 
             fileRef.putFile(selectedFileUri)
                     .addOnSuccessListener(taskSnapshot -> fileRef.getDownloadUrl().addOnSuccessListener(downloadUri -> {
@@ -355,7 +366,17 @@ public class TaskDetailsActivity extends AppCompatActivity {
                             // Success handling
                             Toast.makeText(this, "Task upload added successfully.", Toast.LENGTH_SHORT).show();
                             DatabaseReference taskRef = databaseReference.child("Tasks").child(workSpaceKey).child(newTaskKey);
-
+                            binding.interactionBlocker.setVisibility(View.GONE);
+                            binding.uploadProgressBar.setVisibility(View.GONE);
+                            binding.submitButton.setClickable(false);
+                            binding.uploadFile.setClickable(false);
+                            binding.uploadedFile.setClickable(true);
+                            setSupportActionBar(binding.toolbar);
+                            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                            binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+                            binding.uploadedFile.setBackgroundColor(getColor(R.color.opaquewhite));
+                            binding.uploadFile.setFocusable(false);
+                            binding.taskFile.setClickable(true);
                             // Increment submittedCount
                             taskRef.child("submittedCount").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override

@@ -104,9 +104,12 @@
 
             <ImageView
                 android:id="@+id/taskFile"
-                android:layout_width="125dp"
-                android:layout_height="125dp"
+               android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="150dp"
+                android:maxHeight="150dp"
                 android:layout_marginTop="25dp"
+                android:background="@color/opaquewhite"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/createdDate"
@@ -192,9 +195,12 @@
 
             <ImageView
                 android:id="@+id/uploadedFile"
-                android:layout_width="125dp"
-                android:layout_height="125dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
+                android:maxHeight="150dp"
+                android:maxWidth="150dp"
+                android:background="@color/opaquewhite"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/uploadFile"
@@ -224,7 +230,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="File Name"
                 android:textColor="@color/primary"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -251,6 +256,28 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/taskDeadline" />
+
+            <ProgressBar
+                android:id="@+id/uploadProgressBar"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginTop="95dp"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                android:indeterminateTint="@color/primary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/uploadFile" />
+
+            <View
+                android:id="@+id/interactionBlocker"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#1AFFFFFF"
+                android:clickable="false"
+                android:focusable="true"
+                android:visibility="gone" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

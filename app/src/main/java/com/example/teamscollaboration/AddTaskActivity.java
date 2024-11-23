@@ -178,6 +178,8 @@ public class AddTaskActivity extends AppCompatActivity {
                 uploading = true;
                 binding.interactionBlocker.setVisibility(View.VISIBLE);
                 binding.uploadProgressBar.setVisibility(View.VISIBLE);
+                binding.uploadProgressBar.bringToFront();
+                binding.chooseFile.setBackgroundColor(Color.TRANSPARENT);
                 binding.submitTaskButton.setClickable(false);
                 binding.chooseFile.setClickable(false);
                 binding.submitTaskButton.setFocusable(false);
@@ -431,6 +433,7 @@ private void saveFileMetadataToDatabase(String downloadUrl, String newTaskKey) {
                 binding.submitTaskButton.setText("Uploaded");
                 binding.submitTaskButton.setClickable(false);
                 binding.chooseFile.setClickable(true);
+                binding.chooseFile.setBackgroundColor(getColor(R.color.opaquewhite));
                 setSupportActionBar(binding.toolbar);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);

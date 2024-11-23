@@ -214,6 +214,10 @@ public class ProfileFragment extends Fragment {
             ((MainActivity) getActivity()).setBottomBarEnabled(false);
             binding.uploadProgressBar.setVisibility(View.VISIBLE);
             binding.interactionBlocker.setVisibility(View.VISIBLE);
+            binding.uploadProgressBar.bringToFront();
+            binding.uploadPic.setClickable(false);
+            binding.editButton.setClickable(false);
+            binding.saveInfoButton.setClickable(false);
             binding.logOutButton.setEnabled(false);
             UploadTask uploadTask = imageRef.putFile(imageUri);
             uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -230,6 +234,8 @@ public class ProfileFragment extends Fragment {
                                             binding.userImage.setImageURI(imageUri);
                                             binding.uploadProgressBar.setVisibility(View.GONE);
                                             binding.interactionBlocker.setVisibility(View.GONE);
+                                            binding.editButton.setClickable(true);
+                                            binding.saveInfoButton.setClickable(true);
                                             binding.logOutButton.setEnabled(true);
                                             ((MainActivity) getActivity()).setBottomBarEnabled(true);
                                         }
@@ -239,6 +245,9 @@ public class ProfileFragment extends Fragment {
                                             Toast.makeText(requireContext(), "Image Update Failed", Toast.LENGTH_SHORT).show();
                                             binding.uploadProgressBar.setVisibility(View.GONE);
                                             binding.interactionBlocker.setVisibility(View.GONE);
+                                            binding.uploadPic.setClickable(true);
+                                            binding.editButton.setClickable(true);
+                                            binding.saveInfoButton.setClickable(true);
                                             binding.logOutButton.setEnabled(true);
                                             ((MainActivity) getActivity()).setBottomBarEnabled(true);
                                         }

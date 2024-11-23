@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
@@ -41,6 +42,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import org.checkerframework.checker.units.qual.C;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -133,8 +137,10 @@ public class AddStreamActivity extends AppCompatActivity {
                 // If all fields are filled, proceed to save the stream in workspace
                 binding.interactionBlocker.setVisibility(View.VISIBLE);
                 binding.uploadProgressBar.setVisibility(View.VISIBLE);
+                binding.uploadProgressBar.bringToFront();
                 binding.uploadButton.setClickable(false);
                 binding.chooseFile.setClickable(false);
+                binding.chooseFile.setBackgroundColor(Color.TRANSPARENT);
                 binding.uploadButton.setFocusable(false);
                 binding.chooseFileButton.setFocusable(false);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -253,6 +259,7 @@ public class AddStreamActivity extends AppCompatActivity {
                                 binding.uploadButton.setText("Uploaded");
                                 binding.uploadButton.setClickable(false);
                                 binding.chooseFile.setClickable(true);
+                                binding.chooseFile.setBackgroundColor(getColor(R.color.opaquewhite));
                                 setSupportActionBar(binding.toolbar);
                                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                                 binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);

@@ -85,21 +85,21 @@
     <ProgressBar
         android:id="@+id/uploadProgressBar"
         style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="95dp"
         android:layout_gravity="center"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:indeterminateTint="@color/primary"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="@+id/chooseFileButton"
+        app:layout_constraintStart_toStartOf="@+id/chooseFileButton"
+        app:layout_constraintTop_toBottomOf="@+id/chooseFileButton" />
 
     <View
         android:id="@+id/interactionBlocker"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/opaquewhite"
+        android:background="#1AFFFFFF"
         android:clickable="false"
         android:focusable="true"
         android:visibility="gone" />
@@ -123,9 +123,12 @@
 
     <ImageView
         android:id="@+id/chooseFile"
-        android:layout_width="200dp"
-        android:layout_height="150dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxHeight="150dp"
+        android:maxWidth="150dp"
         android:layout_marginTop="25dp"
+        android:background="@color/opaquewhite"
         android:src="@drawable/addfile"
         app:layout_constraintEnd_toEndOf="@+id/chooseFileButton"
         app:layout_constraintStart_toStartOf="@+id/chooseFileButton"
@@ -136,7 +139,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="File Name"
         android:textColor="@color/primary"
         android:textSize="18sp"
         android:textStyle="bold"

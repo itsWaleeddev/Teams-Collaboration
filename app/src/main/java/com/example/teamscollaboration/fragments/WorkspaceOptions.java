@@ -170,26 +170,18 @@ public class WorkspaceOptions extends BottomSheetDialogFragment {
     private void deleteStorageData() {
         // Reference to the workspace storage
         StorageReference workSpaceRef = storageReference.child("Workspaces").child(getArguments().getString(WORKSPACE_KEY));
-        // Check if file exists
-        workSpaceRef.getMetadata().addOnSuccessListener(metadata -> {
             // File exists, proceed with deletion
             workSpaceRef.delete().addOnSuccessListener(aVoid -> {
                 Toast.makeText(requireContext(), "Workspace and associated data deleted successfully", Toast.LENGTH_SHORT).show();
-                dismiss();
-            }).addOnFailureListener(e -> {
-                Toast.makeText(requireContext(), "Failed to delete from storage: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            });
-        }).addOnFailureListener(e -> {
-            if (isAdded()) {
-                Toast.makeText(requireContext(), "Workspace Deleted Successfully", Toast.LENGTH_SHORT).show();
                 deletedCheck = true;
                 dismiss();
-            }
-            if (e instanceof StorageException && ((StorageException) e).getErrorCode() == StorageException.ERROR_OBJECT_NOT_FOUND) {
-                Log.d("checkDelete", "deleteStorageData: No file found at the specified storage path");
-            } else {
-                Log.d("checkDelete", "deleteStorageData: Error checking storage" + e.getMessage());
-            }
-        });
+            }).addOnFailureListener(e -> {
+                if (isAdded()) {
+                    Toast.makeText(requireContext(), "Workspace Deleted Successfully", Toast.LENGTH_SHORT).show();
+                    deletedCheck = true;
+                    dismiss();
+                }
+                Log.d("storageCheck", "deleteStorageData: Failed to delete from storage: " + e.getMessage());
+            });
     }
 }
