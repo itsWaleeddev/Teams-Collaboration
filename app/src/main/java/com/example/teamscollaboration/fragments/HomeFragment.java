@@ -1,5 +1,6 @@
 package com.example.teamscollaboration.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -41,6 +42,33 @@ public class HomeFragment extends Fragment {
     FirebaseAuth auth;
     List<WorkSpaceModel> workSpaceModelList = new ArrayList<>();
     WorkSpaceAdapter workSpaceAdapter;
+    private final int REQUEST_CODE = 123;
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                Log.d("DismissedFragment", "onActivityResult: " + REQUEST_CODE);
+                String workspacekey = data.getStringExtra("workspacekey");
+                Boolean deletedCheck = data.getBooleanExtra("deletedCheck",false);
+                if(deletedCheck) {
+                    for (int i = 0; i < workSpaceModelList.size(); i++) {
+                        WorkSpaceModel workSpaceModel = workSpaceModelList.get(i);
+                        if (workspacekey.equals(workSpaceModel.getWorkSpaceKey())) {
+                            workSpaceModelList.remove(i);
+                            workSpaceAdapter.notifyItemChanged(i);
+                            break;
+                        }
+                    }
+                    if (workSpaceModelList.isEmpty()) {
+                        binding.workspacesLayout.setVisibility(View.GONE);
+                        binding.noWorkspaces.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -80,9 +108,7 @@ public class HomeFragment extends Fragment {
                             startActivity(intent);
                         }
                     });
-                    setAdapter();
                     retrieveWorkSpaces();
-
                 }
             }
 
@@ -94,15 +120,20 @@ public class HomeFragment extends Fragment {
     }
 
     private void setAdapter() {
-        binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        workSpaceAdapter = new WorkSpaceAdapter(requireContext(), workSpaceModelList);
-        binding.recyclerView.setAdapter(workSpaceAdapter);
+        if(!workSpaceModelList.isEmpty()) {
+            binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+            workSpaceAdapter = new WorkSpaceAdapter(this ,requireContext(), workSpaceModelList);
+            binding.recyclerView.setAdapter(workSpaceAdapter);
+        }else{
+            binding.workspacesLayout.setVisibility(View.GONE);
+            binding.noWorkspaces.setVisibility(View.VISIBLE);
+        }
 
     }
 
     private void retrieveWorkSpaces() {
         retrieveAdminWorkSpaces(); //For retrieving workspaces in which user is admin
-        retrieveTeamWorkSpaces();  //For retrieving workspaces in which user is member
+       // retrieveTeamWorkSpaces();  //For retrieving workspaces in which user is member
     }
 
     private void retrieveAdminWorkSpaces() {
@@ -117,9 +148,10 @@ public class HomeFragment extends Fragment {
                         // Extract each workspace where the adminId matches
                         WorkSpaceModel workspace = workspaceSnapshot.getValue(WorkSpaceModel.class);
                         workSpaceModelList.add(workspace);
-                        workSpaceAdapter.notifyDataSetChanged();
                     }
+                    retrieveTeamWorkSpaces();
                 } else {
+                    retrieveTeamWorkSpaces();
                     // Handle no matching workspaces
                     Log.d("adminCheck", "onDataChange:  user is not admin in any workspace" );
                 }
@@ -152,15 +184,17 @@ public class HomeFragment extends Fragment {
 
                                 // Add to your list and update the adapter
                                 workSpaceModelList.add(workspace);
-                                workSpaceAdapter.notifyDataSetChanged();
-
                             }
                         }
                     }
+                    setAdapter();
                     // Handle case where no matching workspaces are found
                     if (workSpaceModelList.isEmpty() && getActivity() != null && isAdded()) {
                         Log.d("adminCheck", "onDataChange:  user is  admin in all workspace" );
                     }
+                }
+                else {
+                    setAdapter();
                 }
             }
 

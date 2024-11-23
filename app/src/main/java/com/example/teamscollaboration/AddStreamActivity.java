@@ -104,7 +104,7 @@ public class AddStreamActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-        binding.chooseFileButton.setOnClickListener(new View.OnClickListener() {
+        binding.chooseFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openFileChooser();
@@ -131,6 +131,17 @@ public class AddStreamActivity extends AppCompatActivity {
                     return;
                 }
                 // If all fields are filled, proceed to save the stream in workspace
+                binding.interactionBlocker.setVisibility(View.VISIBLE);
+                binding.uploadProgressBar.setVisibility(View.VISIBLE);
+                binding.uploadButton.setClickable(false);
+                binding.chooseFile.setClickable(false);
+                binding.uploadButton.setFocusable(false);
+                binding.chooseFileButton.setFocusable(false);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                binding.topicNameInput.setFocusable(false);
+                binding.topicCommentInput.setFocusable(false);
+                binding.topicNameInput.setClickable(false);
+                binding.topicCommentInput.setClickable(false);
                 retriveUserData();
             }
         });
@@ -201,7 +212,7 @@ public class AddStreamActivity extends AppCompatActivity {
 
     private void saveStream(String userImage, String userName) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageRef = storage.getReference("Streams/" + auth.getCurrentUser().getUid() + "/");
+        StorageReference storageRef = storage.getReference("Workspaces/"+ workSpaceKey + "/Streams/" + auth.getCurrentUser().getUid() + "/");
         String file_Name = fileName;
         StorageReference fileRef = storageRef.child(file_Name);
 
@@ -215,7 +226,7 @@ public class AddStreamActivity extends AppCompatActivity {
                 // Reference to the stream node in Firebase
                 DatabaseReference streamRef = databaseReference.child("Workspaces").child(workSpaceKey).child("streamModel");
 
-// Get the existing list of stream files
+                // Get the existing list of stream files
                 streamRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -237,9 +248,14 @@ public class AddStreamActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess(Void unused) {
                                 Toast.makeText(AddStreamActivity.this, "Stream Created Successfully", Toast.LENGTH_SHORT).show();
+                                binding.uploadProgressBar.setVisibility(View.GONE);
+                                binding.interactionBlocker.setVisibility(View.GONE);
                                 binding.uploadButton.setText("Uploaded");
                                 binding.uploadButton.setClickable(false);
-                                binding.chooseFileButton.setClickable(false);
+                                binding.chooseFile.setClickable(true);
+                                setSupportActionBar(binding.toolbar);
+                                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                                binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
                                 binding.topicNameInput.setFocusable(false);
                                 binding.topicCommentInput.setFocusable(false);
                                 binding.topicNameInput.setClickable(false);

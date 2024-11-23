@@ -51,7 +51,7 @@ public class TasksMembersAdapter extends RecyclerView.Adapter<TasksMembersAdapte
         List<MembersModel> selectedMembers = new ArrayList<>();
         for (MembersModel member : membersList) {
             if (member.getTaskCheck()) {
-                member.setTaskStatus("pending");
+                member.setTaskStatus("Pending");
                 selectedMembers.add(member);
             }
         }

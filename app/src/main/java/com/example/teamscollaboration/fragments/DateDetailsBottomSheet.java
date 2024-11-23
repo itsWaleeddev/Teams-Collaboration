@@ -1,5 +1,6 @@
 package com.example.teamscollaboration.fragments;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
@@ -44,28 +45,35 @@ public class DateDetailsBottomSheet extends BottomSheetDialogFragment {
             int counter = 0;
             if (detailsList != null && !detailsList.isEmpty()) {
                 StringBuilder detailsText = new StringBuilder();
+                StringBuilder dotText = new StringBuilder();
                 for (String detail : detailsList) {
                     if(detail.equals("No Event Scheduled")){
+                        binding.dottextView.setVisibility(View.GONE);
                         detailsText.append(detail);
                         break;
                     }
                     else{
+                        binding.dottextView.setVisibility(View.VISIBLE);
                         if(counter == detailsList.size()-1){
-                            detailsText.append("• ").append(detail).append(" Deadline");
+                            dotText.append("•");
+                            detailsText.append(detail.toUpperCase()).append(" Deadline");
                         }
                         else{
-                            detailsText.append("• ").append(detail).append(" Deadline").append("\n");
+                            detailsText.append(detail.toUpperCase()).append(" Deadline").append("\n");
+                            dotText.append("•").append("\n");
                         }
                     }
                     counter++;
                 }
+                binding.dottextView.setText(dotText.toString());
                 binding.detailsTextView.setText(detailsText.toString());
                 if(binding.detailsTextView.getText().toString().equals("No Event Scheduled")){
-                    binding.detailsTextView.setTextColor(getResources().getColor(R.color.bblue));
+                    binding.detailsTextView.setTextColor(getResources().getColor(R.color.primary));
+                    binding.getRoot().setBackgroundColor(getResources().getColor(R.color.background));
                 }
                 else{
-                    binding.detailsTextView.setTextColor(getResources().getColor(R.color.red));
-
+                    binding.detailsTextView.setTextColor(getResources().getColor(R.color.primary));
+                    binding.getRoot().setBackgroundColor(getResources().getColor(R.color.background));
                 }
             }
         }
@@ -76,5 +84,4 @@ public class DateDetailsBottomSheet extends BottomSheetDialogFragment {
         super.onDestroyView();
         binding = null;
     }
-
 }

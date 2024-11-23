@@ -134,7 +134,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
         newTaskKey = tasksModel.getTaskKey();
         workSpaceKey = tasksModel.getWorkSpaceKey();
         getTaskStatus();
-        binding.toolbar.setTitle(tasksModel.getTaskName());
+        binding.toolbar.setTitle(tasksModel.getTaskName().toUpperCase());
         binding.ownerName.setText(tasksModel.getTaskOwner());
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -219,7 +219,6 @@ public class TaskDetailsActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
 
     @Override
@@ -310,8 +309,8 @@ public class TaskDetailsActivity extends AppCompatActivity {
 
     private void uploadFileToFirebase() {
         if (selectedFileUri != null) {
-            StorageReference storageRef = FirebaseStorage.getInstance().getReference("Uploaded_Tasks/" + userID +"/");
-            StorageReference fileRef = storageRef.child(tasksModel.getTaskKey() + "." + getFileExtension(selectedFileUri));
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference("Workspaces/Tasks/"+ newTaskKey + "/Uploaded_Tasks/" + userID +"/");
+            StorageReference fileRef = storageRef.child(userID + "." + getFileExtension(selectedFileUri));
 
             fileRef.putFile(selectedFileUri)
                     .addOnSuccessListener(taskSnapshot -> fileRef.getDownloadUrl().addOnSuccessListener(downloadUri -> {

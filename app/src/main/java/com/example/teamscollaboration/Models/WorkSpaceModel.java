@@ -17,10 +17,11 @@ public class WorkSpaceModel implements Serializable {
     String workSpaceKey = null;
     String adminImage = null;
     ArrayList<StreamModel> streamModel = null;
+    int background;
 
     public WorkSpaceModel(String workSpaceKey, String workSpaceName, String workSpaceDescription, String deadLine, String priority,
                           Long created_at, String adminId, String adminName, List<MembersModel> membersList,
-                          String teamLeader, String adminImage, ArrayList<StreamModel> streamModel) {
+                          String teamLeader, String adminImage, ArrayList<StreamModel> streamModel, int background) {
         this.workSpaceKey = workSpaceKey;
         this.workSpaceName = workSpaceName;
         this.workSpaceDescription = workSpaceDescription;
@@ -33,6 +34,7 @@ public class WorkSpaceModel implements Serializable {
         this.TeamLeader = teamLeader;
         this.adminImage = adminImage;
         this.streamModel = streamModel;
+        this.background = background;
     }
 
     public WorkSpaceModel() {
@@ -62,6 +64,14 @@ public class WorkSpaceModel implements Serializable {
 
     public void setStreamModel(ArrayList<StreamModel> streamModel) {
         this.streamModel = streamModel;
+    }
+
+    public int getBackground() {
+        return background;
+    }
+
+    public void setBackground(int background) {
+        this.background = background;
     }
 
     public String getAdminImage() {

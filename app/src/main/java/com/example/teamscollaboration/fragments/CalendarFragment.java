@@ -1,10 +1,9 @@
 package com.example.teamscollaboration.fragments;
 
-import android.app.AlertDialog;
-import android.content.Intent;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -16,22 +15,20 @@ import androidx.fragment.app.Fragment;
 
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
-import android.text.style.ReplacementSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.OvershootInterpolator;
-import android.view.animation.ScaleAnimation;
-import android.widget.TextView;
 
+import com.airbnb.lottie.LottieProperty;
+import com.airbnb.lottie.model.KeyPath;
+import com.airbnb.lottie.value.LottieFrameInfo;
+import com.airbnb.lottie.value.SimpleLottieValueCallback;
 import com.example.teamscollaboration.Models.MembersModel;
 import com.example.teamscollaboration.Models.TasksModel;
 import com.example.teamscollaboration.Models.WorkSpaceModel;
 import com.example.teamscollaboration.R;
-import com.example.teamscollaboration.WorkSpacesList;
 import com.example.teamscollaboration.databinding.FragmentCalendarBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -46,7 +43,6 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 
-import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,6 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -66,6 +63,7 @@ public class CalendarFragment extends Fragment {
     DatabaseReference databaseReference;
     List<WorkSpaceModel> workSpaceModelList = new ArrayList<>();
     List<TasksModel> tasksModelList = new ArrayList<>();
+    CalendarDay previousSelectedDate;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,11 +83,37 @@ public class CalendarFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         calendarView = binding.calendarView;
+        binding.lottieAnimationView.setAnimation(R.raw.calendaranimation);
+        binding.lottieAnimationView.addValueCallback(
+                new KeyPath("checkmark", "**"),
+                LottieProperty.COLOR_FILTER,
+                new SimpleLottieValueCallback<ColorFilter>() {
+                    @Override
+                    public ColorFilter getValue(LottieFrameInfo<ColorFilter> frameInfo) {
+                        return new PorterDuffColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.SRC_ATOP);
+                    }
+                }
+        );
+        binding.calendarView.setLeftArrow(R.drawable.back);
+        binding.calendarView.setRightArrow(R.drawable.next);
         retrieveWorkSpaces();
     }
 
     private void highlightTaskDeadlines() {
-        Map<CalendarDay, List<String>> dateDetailsMap = getTaskDeadlines(); // Fetch your task deadlines from the database
+        Map<CalendarDay, List<String>> dateDetailsMap = getTaskDeadlines();// Fetch your task deadlines from the database
+        List<CalendarDay> taskDeadlines = new ArrayList<>(dateDetailsMap.keySet());
+        //Log.d("calendarCheck", "highlightTaskDeadlines: " + taskDeadlines.get(0));
+        // Mark deadlines on the calendar
+        if (!taskDeadlines.isEmpty()) {
+            List<DayViewDecorator> decorators = new ArrayList<>();
+            for (CalendarDay deadline : taskDeadlines) {
+                decorators.add(new EventDecorator(deadline, dateDetailsMap.get(deadline), false));
+            }
+
+            for (DayViewDecorator decorator : decorators) {
+                calendarView.addDecorator(decorator);
+            }
+        }
         // Setup listener for date selection
         binding.calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
@@ -98,32 +122,33 @@ public class CalendarFragment extends Fragment {
                 if (details != null && !details.isEmpty()) {
                     DateDetailsBottomSheet dialog = DateDetailsBottomSheet.newInstance(details);
                     dialog.show(getParentFragmentManager(), "DateDetailsBottomSheet");
-                }else{
+                } else {
                     List<String> detail = new ArrayList<>();
                     detail.add("No Event Scheduled");
                     DateDetailsBottomSheet dialog = DateDetailsBottomSheet.newInstance(detail);
                     dialog.show(getParentFragmentManager(), "DateDetailsBottomSheet");
                 }
+                boolean isMatched = false;
+                for (CalendarDay calendarDay : taskDeadlines) {
+                    if (calendarDay.equals(date)) {
+                        isMatched = true;
+                        break;
+                    }
+                }
+                if (previousSelectedDate != null && !previousSelectedDate.equals(date)) {
+                    widget.addDecorator(new EventDecorator(previousSelectedDate, new ArrayList<>(), false));
+                }
+                if (!isMatched) {
+                    widget.addDecorator(new EventDecorator(date, new ArrayList<>(), true));
+                    previousSelectedDate = date;
+                }
             }
         });
-        List<CalendarDay> taskDeadlines = new ArrayList<>(dateDetailsMap.keySet());
-        // Mark deadlines on the calendar
-        if(!taskDeadlines.isEmpty()){
-            List<DayViewDecorator> decorators = new ArrayList<>();
-            for (CalendarDay deadline : taskDeadlines) {
-                decorators.add(new EventDecorator(deadline));
-            }
-
-            for (DayViewDecorator decorator : decorators) {
-                calendarView.addDecorator(decorator);
-            }
-        }
-
     }
 
     // Example method that returns a list of task deadlines as CalendarDay objects
     private Map<CalendarDay, List<String>> getTaskDeadlines() {
-        Map<CalendarDay, List<String>> dateDetailsMap  = new HashMap<>();
+        Map<CalendarDay, List<String>> dateDetailsMap = new HashMap<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
         Log.d("calendarCheck", "getTaskDeadlines: getTaskDeadline Method called");
         if (!tasksModelList.isEmpty()) {
@@ -168,9 +193,13 @@ public class CalendarFragment extends Fragment {
     class EventDecorator implements DayViewDecorator {
         private CalendarDay date;
         private Drawable highlightDrawable;
+        List<String> dateDetails;
+        Boolean isSelected;
 
-        public EventDecorator(CalendarDay date) {
+        public EventDecorator(CalendarDay date, List<String> dateDetails, Boolean isSelected) {
             this.date = date;
+            this.dateDetails = dateDetails;
+            this.isSelected = isSelected;
             this.highlightDrawable = ContextCompat.getDrawable(calendarView.getContext(), R.drawable.circle_background);
         }
 
@@ -181,11 +210,25 @@ public class CalendarFragment extends Fragment {
 
         @Override
         public void decorate(DayViewFacade view) {
-            view.addSpan(new DotSpan(8, Color.WHITE));
-            view.addSpan(new ForegroundColorSpan(Color.WHITE));  // Text color for contrast
-            view.addSpan(new StyleSpan(Typeface.BOLD)); // Bold style for highlighted dates
-            view.setBackgroundDrawable(highlightDrawable);
-            view.addSpan(new RelativeSizeSpan(1.0f));
+            if (isSelected) {
+                if (dateDetails.isEmpty()) {
+                    view.addSpan(new ForegroundColorSpan(Color.WHITE));
+                }
+            } else {
+                if (dateDetails.size() > 1) {
+                    view.addSpan(new DotSpan(10, Color.RED));
+                }
+                if (!dateDetails.isEmpty()) {
+                    view.addSpan(new ForegroundColorSpan(Color.WHITE));  // Text color for contrast
+                    view.addSpan(new StyleSpan(Typeface.BOLD)); // Bold style for highlighted dates
+                    view.setBackgroundDrawable(highlightDrawable);
+                    view.addSpan(new RelativeSizeSpan(1.0f));
+                }
+                if (dateDetails.isEmpty()) {
+                    view.addSpan(new ForegroundColorSpan(Color.BLACK));
+                }
+            }
+
         }
     }
 
@@ -199,13 +242,13 @@ public class CalendarFragment extends Fragment {
                     AtomicInteger completedCount = new AtomicInteger(0); // Counter for completed listeners
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         String workSpaceKey = dataSnapshot.getKey();
-                        Log.d("calendarCheck", "retrieveTasks: " + workSpaceKey);
+                        Log.d("calendarCheck", "retrieveWorkspaces: " + workSpaceKey);
                         databaseReference.child("Workspaces").child(workSpaceKey)
                                 .addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                         WorkSpaceModel workSpaceModel = snapshot.getValue(WorkSpaceModel.class);
-                                        Log.d("calendarCheck", "retrieveTasks: " + workSpaceModel.toString());
+                                        Log.d("calendarCheck", "retrieveWorkspaces: " + workSpaceModel.toString());
                                         if (workSpaceModel.getAdminId().equals(auth.getCurrentUser().getUid())) {
                                             workSpaceModelList.add(workSpaceModel);
                                         }
@@ -239,53 +282,155 @@ public class CalendarFragment extends Fragment {
         });
     }
 
-    private void retrieveTasks() {
-        for (WorkSpaceModel workSpaceModel : workSpaceModelList) {
-            Log.d("calendarCheck", "retrieveTasks: " + workSpaceModel.toString());
-            databaseReference.child("Tasks").child(workSpaceModel.getWorkSpaceKey()).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            String taskKey = dataSnapshot.getKey();
-                            Log.d("calendarCheck", "onDataChange: " + taskKey);
-                            databaseReference.child("Tasks").child(workSpaceModel.getWorkSpaceKey()).child(taskKey)
-                                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            if (snapshot.exists()) {
-                                                TasksModel tasksModel = snapshot.getValue(TasksModel.class);
-                                                Log.d("calendarCheck", "onDataChange: " + tasksModel.toString());
-                                                List<MembersModel> membersModels = tasksModel.getMembersList();
-                                                for (MembersModel membersModel : membersModels) {
-                                                    if (membersModel.getuID().equals(auth.getCurrentUser().getUid())) {
-                                                        tasksModelList.add(tasksModel);
-                                                        Log.d("calendarCheck", "onDataChange: task model added " + tasksModel.toString());
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                            // After loading tasks for this workspace, check if all workspaces are processed
-                                            if (workSpaceModel == workSpaceModelList.get(workSpaceModelList.size() - 1)) {
-                                                Log.d("calendarCheck", "onDataChange: highlightTaskDeadlines method called");
-                                                highlightTaskDeadlines();
-                                            }
-                                        }
+    /* private void retrieveTasks() {
+         for (WorkSpaceModel workSpaceModel : workSpaceModelList) {
+             Log.d("calendarCheck", "retrieveTasks: " + workSpaceModel.toString());
+             databaseReference.child("Tasks").child(workSpaceModel.getWorkSpaceKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                 @Override
+                 public void onDataChange(@NonNull DataSnapshot snapshot) {
+                     if (snapshot.exists()) {
+                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                             String taskKey = dataSnapshot.getKey();
+                             Log.d("calendarCheck", "onDataChange: " + taskKey);
+                             databaseReference.child("Tasks").child(workSpaceModel.getWorkSpaceKey()).child(taskKey)
+                                     .addListenerForSingleValueEvent(new ValueEventListener() {
+                                         @Override
+                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                             if (snapshot.exists()) {
+                                                 TasksModel tasksModel = snapshot.getValue(TasksModel.class);
+                                                 Log.d("calendarCheck", "onDataChange: " + tasksModel.toString());
+                                                 List<MembersModel> membersModels = tasksModel.getMembersList();
+                                                 for (MembersModel membersModel : membersModels) {
+                                                     if (membersModel.getuID().equals(auth.getCurrentUser().getUid())) {
+                                                         tasksModelList.add(tasksModel);
+                                                         Log.d("calendarCheck", "onDataChange: task model added " + tasksModel.toString());
+                                                         break;
+                                                     }
+                                                 }
+                                                 // After loading tasks for this workspace, check if all workspaces are processed
+                                                 if (workSpaceModel == workSpaceModelList.get(workSpaceModelList.size() - 1)) {
+                                                     Log.d("calendarCheck", "onDataChange: highlightTaskDeadlines method called");
+                                                     highlightTaskDeadlines();
+                                                 }
+                                             }
+                                         }
 
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-                                            Log.d("calendarCheck", "onCancelled: " + error.getDetails());
-                                        }
-                                    });
+                                         @Override
+                                         public void onCancelled(@NonNull DatabaseError error) {
+                                             Log.d("calendarCheck", "onCancelled: " + error.getDetails());
+                                         }
+                                     });
+                         }
+                     }
+                    else {
+                         // After loading tasks for this workspace, check if all workspaces are processed
+                         if (workSpaceModel == workSpaceModelList.get(workSpaceModelList.size() - 1)) {
+                             Log.d("calendarCheck", "onDataChange: highlightTaskDeadlines method called");
+                             highlightTaskDeadlines();
+                         }
+                     }
+                 }
+
+                 @Override
+                 public void onCancelled(@NonNull DatabaseError error) {
+                     Log.d("calendarCheck", "onCancelled: " + error.getDetails());
+                 }
+             });
+         }*/
+    private void retrieveTasks() {
+        CompletableFuture<Void> chain = CompletableFuture.completedFuture(null);
+        WorkSpaceModel workSpaceModell = new WorkSpaceModel();
+
+        for (WorkSpaceModel workSpaceModel : workSpaceModelList) {
+            workSpaceModell = workSpaceModel;
+            chain = chain.thenCompose(ignored -> processWorkspaceTasks(workSpaceModel));
+        }
+
+        WorkSpaceModel finalWorkSpaceModell = workSpaceModell;
+        chain.thenRun(() -> {
+            if (finalWorkSpaceModell == workSpaceModelList.get(workSpaceModelList.size() - 1)) {
+                Log.d("calendarCheck", "onDataChange: highlightTaskDeadlines method called");
+                highlightTaskDeadlines();
+            }
+           /* Log.d("calendarCheck", "All workspaces processed. Calling highlightTaskDeadlines.");
+            highlightTaskDeadlines();*/
+        }).exceptionally(error -> {
+            Log.d("calendarCheck", "Error in processing tasks: " + error.getMessage());
+            return null;
+        });
+    }
+
+    private CompletableFuture<Void> processWorkspaceTasks(WorkSpaceModel workSpaceModel) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        databaseReference.child("Tasks").child(workSpaceModel.getWorkSpaceKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    CompletableFuture<Void> innerChain = CompletableFuture.completedFuture(null);
+
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        String taskKey = dataSnapshot.getKey();
+
+                        innerChain = innerChain.thenCompose(ignored -> processTask(workSpaceModel.getWorkSpaceKey(), taskKey));
+                    }
+
+                    innerChain.whenComplete((ignored, throwable) -> {
+                        if (throwable != null) {
+                            Log.d("calendarCheck", "Error in inner task processing: " + throwable.getMessage());
+                            future.completeExceptionally(throwable);
+                        } else {
+                            future.complete(null);
+                        }
+                    });
+                } else {
+                    Log.d("calendarCheck", "No tasks found for workspace: " + workSpaceModel.getWorkSpaceKey());
+                    future.complete(null);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("calendarCheck", "Workspace tasks retrieval cancelled: " + error.getDetails());
+                future.completeExceptionally(new RuntimeException(error.getMessage()));
+            }
+        });
+
+        return future;
+    }
+
+    private CompletableFuture<Void> processTask(String workspaceKey, String taskKey) {
+        CompletableFuture<Void> taskFuture = new CompletableFuture<>();
+
+        databaseReference.child("Tasks").child(workspaceKey).child(taskKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    TasksModel tasksModel = snapshot.getValue(TasksModel.class);
+
+                    if (tasksModel != null) {
+                        Log.d("calendarCheck", "Processing task: " + tasksModel);
+
+                        List<MembersModel> membersModels = tasksModel.getMembersList();
+                        for (MembersModel membersModel : membersModels) {
+                            if (membersModel.getuID().equals(auth.getCurrentUser().getUid())) {
+                                tasksModelList.add(tasksModel);
+                                Log.d("calendarCheck", "Task added: " + tasksModel);
+                                break;
+                            }
                         }
                     }
                 }
+                taskFuture.complete(null);
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Log.d("calendarCheck", "onCancelled: " + error.getDetails());
-                }
-            });
-        }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("calendarCheck", "Task retrieval cancelled: " + error.getDetails());
+                taskFuture.completeExceptionally(new RuntimeException(error.getMessage()));
+            }
+        });
+
+        return taskFuture;
     }
 }

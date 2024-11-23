@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -42,9 +43,14 @@ public class WorkSpacesList extends AppCompatActivity {
         setAdapter();
     }
     private void setAdapter(){
-        WorkSpaceListAdapter workSpaceListAdapter = new WorkSpaceListAdapter(this, workSpaceModels);
-        binding.recyclerview.setLayoutManager(new LinearLayoutManager(this));
-        binding.recyclerview.setAdapter(workSpaceListAdapter);
+        if(!workSpaceModels.isEmpty()) {
+            WorkSpaceListAdapter workSpaceListAdapter = new WorkSpaceListAdapter(this, workSpaceModels);
+            binding.recyclerview.setLayoutManager(new LinearLayoutManager(this));
+            binding.recyclerview.setAdapter(workSpaceListAdapter);
+        }else{
+            binding.recyclerview.setVisibility(View.GONE);
+            binding.noWorkspaces.setVisibility(View.VISIBLE);
+        }
     }
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {

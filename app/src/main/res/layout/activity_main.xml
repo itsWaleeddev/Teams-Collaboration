@@ -5,14 +5,17 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1A2196F3"
+    android:background="@color/background"
     tools:context=".MainActivity">
 
     <nl.joery.animatedbottombar.AnimatedBottomBar
         android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFF"
+        android:background="@color/white"
+        app:abb_tabColorSelected="@color/tertiary"
+        app:abb_tabColor="@color/primary"
+        app:abb_indicatorColor="@color/primary"
         app:abb_indicatorAppearance="round"
         app:abb_indicatorHeight="4dp"
         app:abb_indicatorMargin="16dp"

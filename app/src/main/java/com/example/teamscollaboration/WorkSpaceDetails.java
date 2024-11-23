@@ -36,7 +36,7 @@ public class WorkSpaceDetails extends AppCompatActivity {
             return insets;
         });
         workSpaceModel = (WorkSpaceModel) getIntent().getSerializableExtra("workSpace");
-        binding.toolbar.setTitle(workSpaceModel.getWorkSpaceName());
+        binding.toolbar.setTitle(workSpaceModel.getWorkSpaceName().toUpperCase());
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);

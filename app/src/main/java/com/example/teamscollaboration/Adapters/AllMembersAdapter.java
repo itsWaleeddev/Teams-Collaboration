@@ -57,7 +57,7 @@ public class AllMembersAdapter extends RecyclerView.Adapter<AllMembersAdapter.Vi
         MembersModel member = selectedMembersList.get(position);
         holder.binding.memberName.setText(member.getName());
         Glide.with(context).load(member.getUserImage()).into(holder.binding.memberImage);
-        holder.binding.getRoot().setOnClickListener(new View.OnClickListener() {
+        holder.binding.profileViewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, MemberDetailsActivity.class);

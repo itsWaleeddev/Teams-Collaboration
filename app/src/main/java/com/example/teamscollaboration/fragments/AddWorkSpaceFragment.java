@@ -3,12 +3,15 @@ package com.example.teamscollaboration.fragments;
 import static android.app.Activity.RESULT_OK;
 
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.text.InputType;
@@ -17,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
@@ -39,6 +43,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 public class AddWorkSpaceFragment extends Fragment {
     FragmentAddWorkSpaceBinding binding;
@@ -93,7 +98,8 @@ public class AddWorkSpaceFragment extends Fragment {
                 @Override
                 public View getDropDownView(int position, View convertView, ViewGroup parent) {
                     View view = super.getDropDownView(position, convertView, parent);
-                    view.setBackgroundColor(Color.WHITE); // Set the background color of the dropdown
+                    // drawable = ContextCompat.getDrawable(requireContext(), R.drawable.edittextshape_2);
+                    view.setBackgroundColor(getResources().getColor(R.color.light_2)); // Set the background color of the dropdown
                     return view;
                 }
             };
@@ -152,15 +158,21 @@ public class AddWorkSpaceFragment extends Fragment {
     private void saveWorkSpace(String userName, String userImage) {
         DatabaseReference workSpaceRef = databaseReference.child("Workspaces");
         String newWorkSpaceKey = workSpaceRef.push().getKey();
+        int[] backgrounds = {
+                R.drawable.two_tone_one,
+                R.drawable.two_tone_second
+        };
+        int randomBackground = backgrounds[new Random().nextInt(backgrounds.length)];
         WorkSpaceModel workSpaceModel = new WorkSpaceModel(newWorkSpaceKey, workSpaceName, workSpaceDescription,
                 deadLine, priority, System.currentTimeMillis(), auth.getCurrentUser().getUid(),
-                userName, selectedMembers, "No Leader Yet", userImage, null);
+                userName, selectedMembers, "No Leader Yet", userImage, null, randomBackground);
         workSpaceRef.child(newWorkSpaceKey).setValue(workSpaceModel);
     }
 
     // DatePickerDialog method
     private void showDatePickerDialog() {
         DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(),
+                R.style.CustomDatePickerTheme,
                 new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker datePicker, int year, int month, int day) {
@@ -179,7 +191,14 @@ public class AddWorkSpaceFragment extends Fragment {
                 Calendar.getInstance().get(Calendar.YEAR),
                 Calendar.getInstance().get(Calendar.MONTH),
                 Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
-
+        datePickerDialog.setOnShowListener(dialog -> {
+            // Access the dialog's buttons
+            Button positiveButton = datePickerDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+            Button negativeButton = datePickerDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+            // Change button text colors
+            positiveButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.primary));
+            negativeButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.primary));
+        });
         datePickerDialog.show();
     }
     private void retrieveUserData() {

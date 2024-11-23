@@ -179,13 +179,13 @@ public class WorkSpaceGraphActivity extends AppCompatActivity {
         legend.setTextSize(12f);    // Adjust text size if necessary
         legend.setWordWrapEnabled(true); // Enable word wrapping if needed for long names
 
-        barChart.setDrawBorders(true);
+        barChart.setDrawBorders(false);
         // Customize the border color
-        barChart.setBorderColor(Color.GRAY); // Set your preferred color for the border
+      //  barChart.setBorderColor(Color.GRAY); // Set your preferred color for the border
         // Customize the border width
-        barChart.setBorderWidth(2f); // Set the border thickness in dp (e.g., 2f for 2dp)
+       // barChart.setBorderWidth(2f); // Set the border thickness in dp (e.g., 2f for 2dp)
         // Customize background color inside the chart borders (optional)
-        barChart.setBackgroundColor(Color.WHITE); // Set background color inside the border
+        barChart.setBackgroundColor(getResources().getColor(R.color.background)); // Set background color inside the border
 
         barChart.invalidate(); // Refresh chart
     }

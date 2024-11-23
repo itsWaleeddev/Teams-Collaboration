@@ -5,8 +5,10 @@
     <color name="blue">#B32196F3</color>
     <color name="red">#FFCC0000</color>
     <color name="green">#4CAF50</color>
+    <color name="littledarkgreen">#53d726</color>
     <color name="lightgreen">#8BC34A</color>
     <color name="greeny">#009688</color>
+    <color name="mahroon">#800000</color>
     <color name="grey">#708090</color>
     <color name="charcoal">#36454F</color>
     <color name="lightgrey">#778899</color>
@@ -14,5 +16,27 @@
     <color name="sapphire">#0F52BA</color>
     <color name="yale">#0E4C92</color>
     <color name="darkgreen">#A64CAF50</color>
-    <color name="lightred">#FF796F</color>
+    <color name="borderred">#C62828</color>
+    <color name="lightred">#E57373</color>
+    <color name="vlightred">#F08080</color>
+    <color name="orange">#FF7043</color>
+    <color name="burntorange">#D84315</color>
+    <color name="opaquewhite">#B3FFFFFF</color>
+    <color name="deadlinecolor">#D32F2F</color>
+    <color name="lightpink">#dab1da</color>
+    <color name="darkGreen">#032f30</color>
+    <color name="bluish">#274D60</color>
+    <color name="bluecontrast">#FFC107</color>
+    <color name="purple">#8E44AD</color>
+    <color name="primary">#117F83</color>
+    <color name="secondary">#149da1</color>
+    <color name="tertiary">#138A92</color>
+    <color name="quaternary">#4fb9af</color>
+    <color name="light_1">#09e6de</color>
+    <color name="border_1">#aefbef</color>
+    <color name="light_2">#c0f6f3</color>
+    <color name="border_2">#66cec8</color>
+    <color name="background">#e5fcfb</color>
+    <color name="darkred">#7c0b02</color>
+
 </resources>

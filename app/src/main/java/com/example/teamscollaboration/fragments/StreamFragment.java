@@ -33,6 +33,7 @@ import java.util.List;
 
 public class StreamFragment extends Fragment {
     FragmentStreamBinding binding;
+    WorkSpaceModel workSpaceModel;
     String workSpaceKey = null;
     FirebaseAuth auth;
     DatabaseReference databaseReference;
@@ -55,6 +56,7 @@ public class StreamFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         workSpaceKey = requireActivity().getIntent().getStringExtra("workSpaceKey");
+        workSpaceModel = (WorkSpaceModel) requireActivity().getIntent().getSerializableExtra("workSpace");
         binding.addStream.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -63,6 +65,9 @@ public class StreamFragment extends Fragment {
                 requireContext().startActivity(intent);
             }
         });
+        if(!(workSpaceModel.getAdminId().equals(auth.getCurrentUser().getUid()))){
+            binding.addStream.setVisibility(View.GONE);
+        }
         retrieveStreams();
     }
     private void retrieveStreams(){
@@ -103,9 +108,25 @@ public class StreamFragment extends Fragment {
         });
     }
     private void setAdapter(){
-        StreamsAdapter streamsAdapter = new StreamsAdapter(requireContext(), streamModels);
-        binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
-        binding.recyclerView.setAdapter(streamsAdapter);
+        if(!streamModels.isEmpty()) {
+            StreamsAdapter streamsAdapter = new StreamsAdapter(requireContext(), streamModels);
+            binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
+            binding.recyclerView.setAdapter(streamsAdapter);
+        }else{
+            binding.noStreams.setVisibility(View.VISIBLE);
+            binding.streamsLayout.setVisibility(View.GONE);
+            binding.lottieAnimationView.setAnimation(R.raw.streamsanimation);
+            if(!(workSpaceModel.getAdminId().equals(auth.getCurrentUser().getUid()))){
+                binding.addStream2.setVisibility(View.GONE);
+            }
+            binding.addStream2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(requireActivity(), AddStreamActivity.class);
+                    intent.putExtra("workSpaceKey", workSpaceKey);
+                    requireContext().startActivity(intent);
+                }
+            });
+        }
     }
-
 }

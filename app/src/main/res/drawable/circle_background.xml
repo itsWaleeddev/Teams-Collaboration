@@ -3,9 +3,9 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:left="4dp" android:right="4dp" android:top="4dp" android:bottom="4dp">
         <shape android:shape="oval">
-            <solid android:color="@color/lightred" />
-            <size android:width="36dp" android:height="36dp"/> <!-- Adjust as needed -->
-            <stroke android:width="1dp" android:color="@color/red" />
+            <solid android:color="@color/vlightred" />
+            <size android:width="50dp" android:height="50dp"/> <!-- Adjust as needed -->
+            <stroke android:width="1dp" android:color="@color/mahroon" />
         </shape>
     </item>
 </layer-list>

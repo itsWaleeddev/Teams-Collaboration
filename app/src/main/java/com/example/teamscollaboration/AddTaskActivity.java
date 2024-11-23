@@ -4,8 +4,12 @@ import static androidx.core.content.ContentProviderCompat.requireContext;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -23,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -31,6 +36,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -42,6 +48,7 @@ import com.example.teamscollaboration.Models.TasksModel;
 import com.example.teamscollaboration.Models.UserModel;
 import com.example.teamscollaboration.Models.WorkSpaceModel;
 import com.example.teamscollaboration.databinding.ActivityAddTaskBinding;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -74,6 +81,8 @@ public class AddTaskActivity extends AppCompatActivity {
     private static final int PICK_FILE_REQUEST_CODE = 1;
     private Uri selectedFileUri;
     String fileName = null;
+    Boolean uploading = false;
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -83,7 +92,7 @@ public class AddTaskActivity extends AppCompatActivity {
             if (selectedMembers != null) {
                 this.selectedMembers = selectedMembers;
             }
-            if(!selectedMembers.isEmpty()){
+            if (!selectedMembers.isEmpty()) {
                 binding.chooseMembersButton.setText("Assigned Members");
             }
         }
@@ -91,6 +100,7 @@ public class AddTaskActivity extends AppCompatActivity {
             if (data != null) {
                 // Retrieve the selected file's URI
                 selectedFileUri = data.getData();
+                String mimeType = getContentResolver().getType(selectedFileUri);
                 if (selectedFileUri != null) {
                     fileName = getFileName(selectedFileUri);
                     binding.fileName.setText(fileName);
@@ -103,10 +113,12 @@ public class AddTaskActivity extends AppCompatActivity {
                         displayImage(selectedFileUri);
                     }
                 }
+                binding.chooseFile.setOnClickListener(v -> openFileInExternalApp(selectedFileUri, mimeType));
             }
         }
 
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -163,10 +175,21 @@ public class AddTaskActivity extends AppCompatActivity {
                     Toast.makeText(AddTaskActivity.this, "Please Choose the members for Task", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
+                uploading = true;
+                binding.interactionBlocker.setVisibility(View.VISIBLE);
+                binding.uploadProgressBar.setVisibility(View.VISIBLE);
+                binding.submitTaskButton.setClickable(false);
+                binding.chooseFile.setClickable(false);
+                binding.submitTaskButton.setFocusable(false);
+                binding.chooseFileButton.setFocusable(false);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                binding.chooseMembersButton.setClickable(false);
+                binding.taskNameInput.setClickable(false);
+                binding.taskDescriptionInput.setClickable(false);
+                binding.taskNameInput.setFocusable(false);
+                binding.taskDescriptionInput.setFocusable(false);
                 // If all fields are filled, proceed to save the workspace
                 retrieveUserData();
-                Toast.makeText(AddTaskActivity.this, "Task Created Successfully", Toast.LENGTH_SHORT).show();
             }
         });
         binding.chooseMembersButton.setOnClickListener(new View.OnClickListener() {
@@ -174,7 +197,7 @@ public class AddTaskActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(AddTaskActivity.this, TasksMembers.class);
                 intent.putExtra("workSpace", (Serializable) workSpaceModel);
-                if(!selectedMembers.isEmpty()) {
+                if (!selectedMembers.isEmpty()) {
                     intent.putExtra("Members", (Serializable) selectedMembers);
                 }
                 startActivityForResult(intent, 0);
@@ -186,7 +209,9 @@ public class AddTaskActivity extends AppCompatActivity {
         binding.deadlineDateInput.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showDatePickerDialog();
+                if(!uploading) {
+                    showDatePickerDialog();
+                }
             }
         });
         binding.deadlineTimeInput.setInputType(InputType.TYPE_NULL);
@@ -195,189 +220,258 @@ public class AddTaskActivity extends AppCompatActivity {
         binding.deadlineTimeInput.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showTimePickerDialog();
-            }
-        });
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId()==android.R.id.home){
-            finish();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void showDatePickerDialog() {
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
-                new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.set(year, month, day);
-
-                        // Format selected date
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
-                        String formattedDate = dateFormat.format(calendar.getTime());
-
-                        // Set formatted date to EditText
-                        binding.deadlineDateInput.setText(formattedDate);
-                    }
-                },
-                // Set default date (current date)
-                Calendar.getInstance().get(Calendar.YEAR),
-                Calendar.getInstance().get(Calendar.MONTH),
-                Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
-
-        datePickerDialog.show();
-    }
-    // TimePickerDialog method
-    private void showTimePickerDialog() {
-        // Get current time as default
-        Calendar calendar = Calendar.getInstance();
-        int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
-        int currentMinute = calendar.get(Calendar.MINUTE);
-
-        // Create TimePickerDialog
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this,
-                new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        Calendar selectedTime = Calendar.getInstance();
-                        selectedTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                        selectedTime.set(Calendar.MINUTE, minute);
-
-                        // Format selected time with AM/PM
-                        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-                        String formattedTime = timeFormat.format(selectedTime.getTime());
-
-                        // Set formatted time to EditText
-                        binding.deadlineTimeInput.setText(formattedTime);
-                    }
-                },
-                currentHour, currentMinute, false); // 'false' for 12-hour format with AM/PM
-
-        timePickerDialog.show();
-    }
-
-    private void saveTask(String userName){
-        DatabaseReference tasksRef = databaseReference.child("Tasks").child(workSpaceKey);
-        String newTaskKey = tasksRef.push().getKey();
-        // Upload the file to Firebase Storage
-        TasksModel tasksModel = new TasksModel(newTaskKey, taskName,taskDescription, taskDeadline,
-                 taskEndTime, System.currentTimeMillis(), auth.getCurrentUser().getUid(), userName,
-                selectedMembers, null, workSpaceKey, "pending", null,
-                null, new ArrayList<>(), 0, selectedMembers.size());
-       tasksRef.child(newTaskKey).setValue(tasksModel);
-       uploadFileToFirebase(newTaskKey);
-    }
-    private void openFileChooser() {
-        // Intent to open file picker
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("*/*"); // Allow all file types; you can specify "application/pdf" or "image/*" for specific types
-
-        // If targeting API 19+, use DocumentsContract to let users pick from external storage providers like Google Drive
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Uri.parse("content://com.android.externalstorage.documents/document/primary:"));
-        }
-
-        startActivityForResult(intent, PICK_FILE_REQUEST_CODE);
-    }
-    // Method to get the file name from URI
-    private String getFileName(Uri uri) {
-        String result = uri.getLastPathSegment();
-        int cut = result.lastIndexOf('/');
-        if (cut != -1) {
-            result = result.substring(cut + 1);
-        }
-        return result;
-    }
-    private boolean isImageFile(Uri uri) {
-        ContentResolver contentResolver = getContentResolver();
-        String type = contentResolver.getType(uri);
-        return type != null && type.startsWith("image/");
-    }
-
-    private boolean isPdfFile(Uri uri) {
-        ContentResolver contentResolver = getContentResolver();
-        String type = contentResolver.getType(uri);
-        return type != null && type.equals("application/pdf");
-    }
-
-    private void displayImage(Uri uri) {
-        try {
-            InputStream inputStream = getContentResolver().openInputStream(uri);
-            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-            binding.chooseFile.setImageBitmap(bitmap);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Error displaying image", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void displayPdfFirstPage(Uri uri) {
-        try {
-            ParcelFileDescriptor fileDescriptor = getContentResolver().openFileDescriptor(uri, "r");
-            if (fileDescriptor != null) {
-                PdfRenderer pdfRenderer = new PdfRenderer(fileDescriptor);
-                PdfRenderer.Page page = pdfRenderer.openPage(0);
-
-                Bitmap bitmap = Bitmap.createBitmap(page.getWidth(), page.getHeight(), Bitmap.Config.ARGB_8888);
-                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-
-                binding.chooseFile.setImageBitmap(bitmap);
-
-                page.close();
-                pdfRenderer.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Error displaying PDF first page", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void uploadFileToFirebase(String newTaskKey) {
-        if (selectedFileUri != null) {
-            StorageReference storageRef = FirebaseStorage.getInstance().getReference("Tasks/");
-            StorageReference fileRef = storageRef.child( newTaskKey + "." + getFileExtension(selectedFileUri));
-            fileRef.putFile(selectedFileUri)
-                    .addOnSuccessListener(taskSnapshot -> fileRef.getDownloadUrl().addOnSuccessListener(downloadUri -> {
-                        String downloadUrl = downloadUri.toString();
-                        saveFileMetadataToDatabase(downloadUrl, newTaskKey);
-                    }))
-                    .addOnFailureListener(e -> Log.d("fileUpload", "uploadFileToFirebase: " + e.getMessage()));
-        }
-    }
-
-    private String getFileExtension(Uri uri) {
-        ContentResolver contentResolver = getContentResolver();
-        MimeTypeMap mime = MimeTypeMap.getSingleton();
-        return mime.getExtensionFromMimeType(contentResolver.getType(uri));
-    }
-    private void saveFileMetadataToDatabase(String downloadUrl, String newTaskKey) {
-        DatabaseReference tasksRef = databaseReference.child("Tasks").child(workSpaceKey);
-        tasksRef.child(newTaskKey).child("fileUri").setValue(downloadUrl);
-        if(fileName!=null) {
-            databaseReference.child("Tasks").child(workSpaceKey);
-            tasksRef.child(newTaskKey).child("fileName").setValue(fileName);
-        }
-    }
-    private void retrieveUserData() {
-        databaseReference.child("Users").child(auth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    UserModel userModel = snapshot.getValue(UserModel.class);
-                    String userName = userModel.getName();
-                    saveTask(userName);
+                if (!uploading) {
+                    showTimePickerDialog();
                 }
             }
+    });
+}
 
+@Override
+public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    if (item.getItemId() == android.R.id.home) {
+        finish();
+    }
+    return super.onOptionsItemSelected(item);
+}
+
+private void showDatePickerDialog() {
+    DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+            R.style.CustomDatePickerTheme,
+            new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(year, month, day);
+
+                    // Format selected date
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+                    String formattedDate = dateFormat.format(calendar.getTime());
+
+                    // Set formatted date to EditText
+                    binding.deadlineDateInput.setText(formattedDate);
+                }
+            },
+            // Set default date (current date)
+            Calendar.getInstance().get(Calendar.YEAR),
+            Calendar.getInstance().get(Calendar.MONTH),
+            Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+    datePickerDialog.setOnShowListener(dialog -> {
+        // Access the dialog's buttons
+        Button positiveButton = datePickerDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        Button negativeButton = datePickerDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+
+        // Change button text colors
+        positiveButton.setTextColor(ContextCompat.getColor(this, R.color.primary));
+        negativeButton.setTextColor(ContextCompat.getColor(this, R.color.primary));
+           /* // Change the DatePicker's spinner or calendar colors if applicable
+            View datePickerView = datePickerDialog.findViewById(Resources.getSystem().getIdentifier("datePicker", "id", "android"));
+            if (datePickerView != null) {
+                datePickerView.setBackgroundColor(ContextCompat.getColor(this, R.color.background));
+            }
+            // Change the header background color (if present)
+            int headerId = Resources.getSystem().getIdentifier("date_picker_header", "id", "android");
+            if (headerId != 0) {
+                View headerView = datePickerDialog.findViewById(headerId);
+                if (headerView != null) {
+                    headerView.setBackgroundColor(ContextCompat.getColor(this, R.color.primary));
+                }
+            }*/
+    });
+    datePickerDialog.show();
+}
+
+// TimePickerDialog method
+private void showTimePickerDialog() {
+    // Get current time as default
+    Calendar calendar = Calendar.getInstance();
+    int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+    int currentMinute = calendar.get(Calendar.MINUTE);
+
+    // Create TimePickerDialog
+    TimePickerDialog timePickerDialog = new TimePickerDialog(this,
+            R.style.CustomDatePickerTheme,
+            new TimePickerDialog.OnTimeSetListener() {
+                @Override
+                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                    Calendar selectedTime = Calendar.getInstance();
+                    selectedTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    selectedTime.set(Calendar.MINUTE, minute);
+
+                    // Format selected time with AM/PM
+                    SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+                    String formattedTime = timeFormat.format(selectedTime.getTime());
+
+                    // Set formatted time to EditText
+                    binding.deadlineTimeInput.setText(formattedTime);
+                }
+            },
+            currentHour, currentMinute, false); // 'false' for 12-hour format with AM/PM
+    timePickerDialog.setOnShowListener(dialog -> {
+        // Access the dialog's buttons
+        Button positiveButton = timePickerDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        Button negativeButton = timePickerDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+        // Change button text colors
+        positiveButton.setTextColor(ContextCompat.getColor(this, R.color.primary));
+        negativeButton.setTextColor(ContextCompat.getColor(this, R.color.primary));
+    });
+    timePickerDialog.show();
+}
+
+private void saveTask(String userName) {
+    DatabaseReference tasksRef = databaseReference.child("Tasks").child(workSpaceKey);
+    String newTaskKey = tasksRef.push().getKey();
+    // Upload the file to Firebase Storage
+    TasksModel tasksModel = new TasksModel(newTaskKey, taskName, taskDescription, taskDeadline,
+            taskEndTime, System.currentTimeMillis(), auth.getCurrentUser().getUid(), userName,
+            selectedMembers, null, workSpaceKey, "Pending", null,
+            null, new ArrayList<>(), 0, selectedMembers.size());
+    tasksRef.child(newTaskKey).setValue(tasksModel);
+    uploadFileToFirebase(newTaskKey);
+}
+
+private void openFileChooser() {
+    // Intent to open file picker
+    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+    intent.addCategory(Intent.CATEGORY_OPENABLE);
+    intent.setType("*/*"); // Allow all file types; you can specify "application/pdf" or "image/*" for specific types
+    String[] mimeTypes = {"application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.openxmlformats-officedocument.presentationml.presentation"};
+    intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+    // If targeting API 19+, use DocumentsContract to let users pick from external storage providers like Google Drive
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Uri.parse("content://com.android.externalstorage.documents/document/primary:"));
+    }
+    startActivityForResult(intent, PICK_FILE_REQUEST_CODE);
+}
+
+// Method to get the file name from URI
+private String getFileName(Uri uri) {
+    String result = uri.getLastPathSegment();
+    int cut = result.lastIndexOf('/');
+    if (cut != -1) {
+        result = result.substring(cut + 1);
+    }
+    return result;
+}
+
+private boolean isImageFile(Uri uri) {
+    ContentResolver contentResolver = getContentResolver();
+    String type = contentResolver.getType(uri);
+    return type != null && type.startsWith("image/");
+}
+
+private boolean isPdfFile(Uri uri) {
+    ContentResolver contentResolver = getContentResolver();
+    String type = contentResolver.getType(uri);
+    return type != null && type.equals("application/pdf");
+}
+
+private void displayImage(Uri uri) {
+    try {
+        InputStream inputStream = getContentResolver().openInputStream(uri);
+        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+        binding.chooseFile.setImageBitmap(bitmap);
+    } catch (Exception e) {
+        e.printStackTrace();
+        Toast.makeText(this, "Error displaying image", Toast.LENGTH_SHORT).show();
+    }
+}
+
+private void displayPdfFirstPage(Uri uri) {
+    try {
+        ParcelFileDescriptor fileDescriptor = getContentResolver().openFileDescriptor(uri, "r");
+        if (fileDescriptor != null) {
+            PdfRenderer pdfRenderer = new PdfRenderer(fileDescriptor);
+            PdfRenderer.Page page = pdfRenderer.openPage(0);
+
+            Bitmap bitmap = Bitmap.createBitmap(page.getWidth(), page.getHeight(), Bitmap.Config.ARGB_8888);
+            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+
+            binding.chooseFile.setImageBitmap(bitmap);
+
+            page.close();
+            pdfRenderer.close();
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        Toast.makeText(this, "Error displaying PDF first page", Toast.LENGTH_SHORT).show();
+    }
+}
+
+private void uploadFileToFirebase(String newTaskKey) {
+    if (selectedFileUri != null) {
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference("Workspaces/" + workSpaceKey + "/Tasks/" + newTaskKey + "/");
+        StorageReference fileRef = storageRef.child(taskName + "." + getFileExtension(selectedFileUri));
+        fileRef.putFile(selectedFileUri)
+                .addOnSuccessListener(taskSnapshot -> fileRef.getDownloadUrl().addOnSuccessListener(downloadUri -> {
+                    String downloadUrl = downloadUri.toString();
+                    saveFileMetadataToDatabase(downloadUrl, newTaskKey);
+                }))
+                .addOnFailureListener(e -> Log.d("fileUpload", "uploadFileToFirebase: " + e.getMessage()));
+    }
+}
+
+private String getFileExtension(Uri uri) {
+    ContentResolver contentResolver = getContentResolver();
+    MimeTypeMap mime = MimeTypeMap.getSingleton();
+    return mime.getExtensionFromMimeType(contentResolver.getType(uri));
+}
+
+private void saveFileMetadataToDatabase(String downloadUrl, String newTaskKey) {
+    DatabaseReference tasksRef = databaseReference.child("Tasks").child(workSpaceKey);
+    tasksRef.child(newTaskKey).child("fileUri").setValue(downloadUrl);
+    if (fileName != null) {
+        databaseReference.child("Tasks").child(workSpaceKey);
+        tasksRef.child(newTaskKey).child("fileName").setValue(fileName).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.d("databaseError", "onCancelled: " + error.getMessage());
+            public void onSuccess(Void unused) {
+                Toast.makeText(AddTaskActivity.this, "Task Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                binding.uploadProgressBar.setVisibility(View.GONE);
+                binding.interactionBlocker.setVisibility(View.GONE);
+                binding.submitTaskButton.setText("Uploaded");
+                binding.submitTaskButton.setClickable(false);
+                binding.chooseFile.setClickable(true);
+                setSupportActionBar(binding.toolbar);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                binding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+                binding.chooseMembersButton.setClickable(false);
+                binding.deadlineDateInput.setClickable(false);
+                binding.deadlineTimeInput.setClickable(false);
+                binding.taskNameInput.setClickable(false);
+                binding.taskDescriptionInput.setClickable(false);
+                uploading = true;
             }
         });
+    }
+}
+
+private void retrieveUserData() {
+    databaseReference.child("Users").child(auth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+            if (snapshot.exists()) {
+                UserModel userModel = snapshot.getValue(UserModel.class);
+                String userName = userModel.getName();
+                saveTask(userName);
+            }
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
+            Log.d("databaseError", "onCancelled: " + error.getMessage());
+        }
+    });
+}
+    // Method to open the selected file in an external app
+    private void openFileInExternalApp(Uri fileUri, String mimeType) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(fileUri, mimeType);
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "No app found to open this file", Toast.LENGTH_SHORT).show();
+        }
     }
 }

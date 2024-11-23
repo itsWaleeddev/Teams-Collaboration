@@ -61,10 +61,11 @@ public class SignInActivity extends AppCompatActivity {
     DatabaseReference databaseReference;
     StorageReference storageReference;
     FirebaseAuth auth;
-    String name = null;
+    String name = "";
     String uId = null;
     String email = null;
     Uri userImage = null;
+    boolean nameCheck = false;
     @Override
     protected void onStart() {
         super.onStart();
@@ -131,18 +132,29 @@ public class SignInActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
-                                        checkUserExistence(new UserExistenceCallback() {
-                                            @Override
-                                            public void onUserExistenceChecked(boolean exists) {
-                                                if (exists) {
-                                                    Toast.makeText(SignInActivity.this, "Logged-in Successfully", Toast.LENGTH_SHORT).show();
-                                                    updateUi();
-                                                } else {
-                                                    saveUserData();
-                                                    Toast.makeText(SignInActivity.this, "Successfully signed-in with Google", Toast.LENGTH_SHORT).show();
-                                                }
+                                        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                                        if(task.getResult().getAdditionalUserInfo().isNewUser()){
+                                            if(name.isEmpty()){
+                                                Toast.makeText(SignInActivity.this, "Enter the name first", Toast.LENGTH_SHORT).show();
+                                                binding.name.setFocusable(true);
+                                                nameCheck = true;
                                             }
-                                        });
+                                            else{
+                                                saveUserData();
+                                                Toast.makeText(SignInActivity.this, "Successfully signed-in with Google", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                        else if(nameCheck){
+                                            name = binding.name.getText().toString().trim();
+                                            if(!name.isEmpty()){
+                                                saveUserData();
+                                                Toast.makeText(SignInActivity.this, "Successfully signed-in with Google", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                        else{
+                                            Toast.makeText(SignInActivity.this, "Welcome back", Toast.LENGTH_SHORT).show();
+                                            updateUi();
+                                        }
                                     } else {
                                         Toast.makeText(SignInActivity.this, "Signed-in Failed", Toast.LENGTH_SHORT).show();
                                     }

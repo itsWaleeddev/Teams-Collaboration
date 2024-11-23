@@ -27,11 +27,6 @@ import java.util.Random;
 public class WorkSpaceListAdapter extends RecyclerView.Adapter<WorkSpaceListAdapter.ViewHolder> {
     private Context context;
     List<WorkSpaceModel> workSpaceModels;
-    private final int[] backgrounds = {
-            R.drawable.two_tone_background,
-            R.drawable.two_tone_two,
-            R.drawable.two_tone_three
-    };
 
     public WorkSpaceListAdapter(Context context,  List<WorkSpaceModel> workSpaceModels) {
         this.context = context;
@@ -55,8 +50,13 @@ public class WorkSpaceListAdapter extends RecyclerView.Adapter<WorkSpaceListAdap
         holder.binding.workspaceDescription.setText(workSpaceModel.getWorkSpaceDescription());
         holder.binding.AdminName.setText(workSpaceModel.getAdminName());
         Glide.with(context).load(workSpaceModel.getAdminImage()).into(holder.binding.AdminImage);
-        int randomBackground = backgrounds[new Random().nextInt(backgrounds.length)];
-        holder.binding.constraint.setBackgroundResource(randomBackground);
+        holder.binding.constraint.setBackgroundResource(workSpaceModel.getBackground());
+        if(workSpaceModel.getBackground() == R.drawable.two_tone_one){
+            holder.binding.constraint.setElevation(40);
+        }
+        else{
+            holder.binding.constraint.setElevation(0);
+        }
         holder.binding.getRoot().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

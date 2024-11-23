@@ -66,7 +66,7 @@ public class TasksPieChartAdapter extends RecyclerView.Adapter<TasksPieChartAdap
 
         // Set custom colors: Red for "Not Submitted" and green for "Submitted" (you can choose other colors too)
         List<Integer> colors = new ArrayList<>();
-        colors.add(Color.GREEN); // Color for "Submitted"
+        colors.add(context.getResources().getColor(R.color.green)); // Color for "Submitted"
         colors.add(Color.RED);   // Color for "Not Submitted"
         dataSet.setColors(colors); // Set the custom colors
 

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- res/drawable/two_tone_background.xml -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Top half color -->
     <item>
         <shape android:shape="rectangle">
-            <gradient android:startColor="@color/lightgrey"
-                android:centerColor="@color/grey"
-                android:endColor="@color/charcoal"/>
+            <gradient android:startColor="#05bbaa"
+                android:centerColor="#CD05BBAA"
+                android:endColor="@color/greeny"/>
+            <corners android:radius="20dp"/>
         </shape>
     </item>
 
@@ -15,6 +15,7 @@
     <item android:top="110dp">
         <shape android:shape="rectangle">
             <solid android:color="@color/white" />
+            <corners android:bottomLeftRadius="20dp" android:bottomRightRadius="20dp"/>
         </shape>
     </item>
 </layer-list>

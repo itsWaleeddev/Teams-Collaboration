@@ -63,11 +63,13 @@ public class StreamsAdapter extends RecyclerView.Adapter<StreamsAdapter.ViewHold
         StreamModel streamModel = streamModels.get(position);
         holder.binding.userName.setText(streamModel.getUserName());
         Glide.with(context).load(streamModel.getUserImage()).into(holder.binding.userImage);
-        holder.binding.topicName.setText(streamModel.getTopicName());
-        holder.binding.topicDescription.setText(streamModel.getTopicComment());
+        String topicName = "Topic: " + streamModel.getTopicName().toUpperCase();
+        holder.binding.topicName.setText(topicName);
+        String topicDescription = "Description: " + streamModel.getTopicComment();
+        holder.binding.topicDescription.setText(topicDescription);
         holder.binding.fileName.setText(streamModel.getFileName());
         Date date = new Date(streamModel.getDate());
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM-dd");
         String formattedDate = sdf.format(date);
         holder.binding.date.setText(formattedDate);
         holder.downloadAndDisplayPdf(streamModel.getTopicFile());

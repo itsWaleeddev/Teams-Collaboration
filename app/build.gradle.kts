@@ -56,7 +56,8 @@ dependencies {
     implementation ("com.github.PhilJay:MPAndroidChart:3.1.0")
     //material calendar
     implementation ("com.github.prolificinteractive:material-calendarview:2.0.0")
-
+    //for lottie files
+    implementation ("com.airbnb.android:lottie:6.5.2")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

@@ -96,7 +96,25 @@ public class DashboardFragment extends Fragment {
                         requireContext().startActivity(intent);
                     }
                 });
+                binding.adminCardView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(requireActivity(), WorkSpacesList.class);
+                        intent.putExtra("title", "You are Admin");
+                        intent.putExtra("WorkSpaces", (Serializable) adminWorkSpacesList);
+                        requireContext().startActivity(intent);
+                    }
+                });
                 binding.nextButton2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(requireActivity(), WorkSpacesList.class);
+                        intent.putExtra("title", "You are Member");
+                        intent.putExtra("WorkSpaces", (Serializable) memberWorkSpacesList);
+                        requireContext().startActivity(intent);
+                    }
+                });
+                binding.memberCardView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(requireActivity(), WorkSpacesList.class);

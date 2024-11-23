@@ -5,4 +5,39 @@
         <item name="android:popupBackground">@color/white</item>
         <item name="android:textColor">@color/black</item> <!-- Change text color if needed -->
     </style>
+
+    <style name="CalendarViewTheme" parent="Theme.MaterialComponents.DayNight">
+        <item name="mcv_showOtherDates">all</item>
+        <item name="mcv_dateTextAppearance">@style/ModernCalendarText</item>
+        <item name="mcv_weekDayTextAppearance">@style/ModernWeekDayText</item>
+        <item name="mcv_headerTextAppearance">@style/CalendarHeaderText</item>
+    </style>
+
+    <style name="ModernCalendarText">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ModernWeekDayText">
+        <item name="android:textColor">@color/secondary</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CalendarHeaderText">
+        <item name="android:textColor">@color/bluish</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CustomDatePickerTheme" parent="Theme.AppCompat.Light.Dialog">
+        <!-- Change the date selector color -->
+        <item name="colorAccent">@color/primary</item>
+
+        <!-- Optional: Customize other colors -->
+        <item name="colorPrimary">@color/background</item>
+        <item name="android:textColorPrimary">@color/black</item>
+    </style>
+
 </resources>

@@ -94,6 +94,9 @@ public class TasksFragment extends Fragment {
                     }
                     setAdapter();
                 }
+                else{
+                    setAdapter();
+                }
             }
 
             @Override
@@ -103,8 +106,26 @@ public class TasksFragment extends Fragment {
         });
     }
     private void setAdapter(){
-        binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
-        WorkSpaceDetailsAdapter workSpaceDetailsAdapter = new WorkSpaceDetailsAdapter(requireActivity(), tasksModelList);
-        binding.recyclerView.setAdapter(workSpaceDetailsAdapter);
+        if(!tasksModelList.isEmpty()){
+            binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
+            WorkSpaceDetailsAdapter workSpaceDetailsAdapter = new WorkSpaceDetailsAdapter(requireActivity(), tasksModelList);
+            binding.recyclerView.setAdapter(workSpaceDetailsAdapter);
+        }
+        else{
+            binding.noTasks.setVisibility(View.VISIBLE);
+            binding.tasksLayout.setVisibility(View.GONE);
+            binding.lottieAnimationView.setAnimation(R.raw.tasksanimation);
+            if(!(workSpaceModel.getAdminId().equals(auth.getCurrentUser().getUid()))){
+                binding.addTask2.setVisibility(View.GONE);
+            }
+            binding.addTask2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent =  new Intent(requireActivity(), AddTaskActivity.class);
+                    intent.putExtra("workSpace", (Serializable) workSpaceModel);
+                    startActivity(intent);
+                }
+            });
+        }
     }
 }
